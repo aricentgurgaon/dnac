@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+   <!--  <link type="text/css" rel="stylesheet" href="/extjs/packages/ext_theme_crisp/build/resources/ext-theme-crisp-all-embedded-css/ext.axd?v=28986" id="ext-theme" />
+    <link type="text/css" rel="stylesheet" href="/extnet/resources/css/extnet-all-embedded-css/ext.axd?v=28986" id="extnet-styles" />
+    <script type="text/javascript" src="/extjs/ext-all-js/ext.axd?v=28986"></script>
+    <script type="text/javascript" src="/extjs/packages/ext_theme_crisp/build/ext-theme-crisp-js/ext.axd?v=28986"></script>
+    <script type="text/javascript" src="/extnet/extnet-all-js/ext.axd?v=28986"></script>
+
+    <script type="text/javascript" src="/extnet/extnet-init-js/ext.axd?d070ce73b93f4748a2fdc126bfb86894"></script> -->
+    </head>
+<style>
+    .req {
+        color: red;
+    }
+
+    ca .captha {
+        cursor: pointer;
+    }
+
+    .captha:hover {
+        cursor: pointer;
+        -webkit-transform: rotate(10deg); /* Chrome, Safari, Opera */
+        transform: rotate(50deg);
+        -moz-animation-duration: 3s;
+    }
+
+    .captha:active {
+        cursor: pointer;
+        -webkit-transform: rotate(20deg); /* Chrome, Safari, Opera */
+        transform: rotate(100deg);
+        -moz-animation-duration: 3s;
+    }
+
+    .FirstRow {
+        width: 870px;
+        height: 40px;
+        background-color: #5AB3F7;
+        border-radius: 4px;
+    }
+
+    .heading {
+        padding-right: 200px;
+        font-family: Aparajita;
+        color: #ffffff;
+        font-size: 22px;
+        text-shadow: 2px 2px 3px #0B659E;
+    }
+
+    .maincontainer {
+        background-color: #EDF7FD;
+        font-family: Cambria;
+        width: 900px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #0B659E;
+        padding: 6px;
+    }
+
+    .middle {
+        margin-top: 0px;
+        width: 870px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #5F9EA0;
+        border-radius: 4px;
+        font-family: Cambria;
+        padding: 4px;
+    }
+
+    .Verification {
+        margin-top: 5px;
+        width: 860px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #5F9EA0;
+        border-radius: 4px;
+        font-family: Candara;
+        padding: 4px;
+    }
+
+    .Legend {
+        color: #FF8C00;
+        font-family: 'Cambria Math';
+        font-weight: 500;
+    }
+
+    .btn.blue {
+        width: 50px;
+        height: 30px;
+        font: Arial, Helvetica, sans-serif;
+        font-size: 14px;
+        color: white;
+        letter-spacing: 0px;
+        text-shadow: none;
+        background-color: #ADEAF5;
+        -webkit-appearance: button;
+        border: none;
+        cursor: pointer;
+        -webkit-transition: all 0.7s ease;
+    }
+
+        .btn.blue:hover {
+            width: 50px;
+            height: 30px;
+            font: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            color: white;
+            letter-spacing: 0px;
+            text-shadow: none;
+            background-color: #ADEAF5;
+            -webkit-appearance: button;
+            border: none;
+            cursor: pointer;
+            -webkit-transition: all 0.7s ease;
+        }
+
+    .border {
+        border-bottom-style: dotted;
+        border-bottom-color: #5F9EA0;
+        border-bottom-width: 2px;
+    }
+
+    .mandatory {
+        text-align: center;
+        font-size: smaller;
+        font-weight: 300;
+        font-family: Arial;
+    }
+
+    .hidediv {
+        /*background-color:#FCAA52;*/
+        color: #F16713;
+        font-family: Cambria;
+        font-size: 15px;
+    }
+
+    /*.profileinfoLP {
+            background-color:aquamarine;
+            margin-left:600px;
+
+	    }
+        input {
+         text-transform: uppercase;
+        }*/
+
+
+    .hidediv2 {
+        float: left;
+        vertical-align: middle;
+        /*background-color:#DC9366;*/
+        /*color:#CF5205;*/
+        font-family: Cambria;
+        font-size: 14px;
+        font-weight: 600;
+        /*width:200px;*/
+    }
+
+    .uppercase {
+        style ="text-transform: uppercase";
+    }
+</style>
+<script src="/resources/js/jquery-1.7.1.min.js"></script>
+<script src="/resources/js/aes.js"></script>
+<script>
+
+
+
+    var ValidateDob = function (no) {
+
+        var CurrentDate = new Date();
+        var oneDay = 24 * 60 * 60 * 1000;
+        //App.txtDOB.getValue();
+        var DOB = ((App.txtDOB.getValue().getYear() + 1900) + '-' + (App.txtDOB.getValue().getMonth() + 1) + '-' + App.txtDOB.getValue().getDate() + ' 00:00:00.000')
+        alert(DOB);
+
+        if (DOB != null) {
+            var diffDays = Math.round(Math.abs((DOB.getTime() - CurrentDate.getTime()) / (oneDay)))
+            diffDays = diffDays + 1
+            alert(diffDays);
+            alert(CurrentDate);
+            alert(DOB);
+        }
+    }
+
+
+    function showUser() {
+        document.getElementById('cID').src = "/AdmissionProcess/ApplicantRegistrationForm/GetCaptchaImage" + "/" + (new Date()).getTime();
+    }
+
+    // 
+
+    var PinLength = function () {
+
+        if (App.txtPerPINCODE.getValue() > 999999) {
+            App.txtPerPINCODE.setValue('');
+        }
+        if (App.txtPINCODE.getValue() > 999999) {
+            App.txtPINCODE.setValue('');
+        }
+    }
+
+    var mobileLength = function () {
+
+        var value = App.txtmobileNumber.getValue();
+        if (App.txtmobileNumber.getValue() > 9999999999) {
+
+            alert('Mobile No should not exceed more than 10 digits.');
+
+            //alert('Enter your 10 digit mobile no.');
+            //App.txtStopText.focus(false, 200);
+        }
+        //App.txtmobileNumber.setValue(value);
+    }
+
+    var SameAsAbove = function () {
+
+        if (Ext.getCmp("chkSameAsAbove").checked) {
+
+
+            Ext.getCmp("txtPerAddress1").setValue(Ext.getCmp("txtCorAddress1").getValue());
+            Ext.getCmp("txtPerAddress2").setValue(Ext.getCmp("txtCorAddress2").getValue());
+            Ext.getCmp("txtPerAddress3").setValue(Ext.getCmp("txtCorAddress3").getValue());
+            Ext.getCmp("txtPerPINCODE").setValue(Ext.getCmp("txtPINCODE").getValue());
+            Ext.getCmp("drpPerStateID").setValue(Ext.getCmp("drpStateID").getValue());
+
+            Ext.getCmp("txtPerAddress1").setReadOnly(true);
+            Ext.getCmp("txtPerAddress2").setReadOnly(true);
+            Ext.getCmp("txtPerAddress3").setReadOnly(true);
+            Ext.getCmp("drpPerDistrictID").setReadOnly(true);
+            Ext.getCmp("drpPerStateID").setReadOnly(true);
+            Ext.getCmp("txtPerPINCODE").setReadOnly(true);
+
+            if (App.drpStateID.getValue() != 5) {
+                document.getElementById('tdPerDistrictLableid').style.display = "none";
+                document.getElementById('tdPerDistrictid').style.display = "none";
+            }
+            else {
+                Ext.getCmp("drpPerDistrictID").setValue(Ext.getCmp("drpDistrictID").getValue());
+            }
+
+        } else {
+
+            App.drpPerStateID.clearValue();
+            App.drpPerStateID.getStore().load();
+            App.drpPerDistrictID.clearValue();
+            App.drpPerDistrictID.getStore().load();
+
+
+
+            document.getElementById('tdPerDistrictLableid').style.display = "block";
+            document.getElementById('tdPerDistrictid').style.display = "block";
+
+            App.txtPerAddress1.setValue('');
+            App.txtPerAddress2.setValue('');
+            App.txtPerAddress3.setValue('');
+            App.txtPerPINCODE.setValue('');
+
+            Ext.getCmp("txtPerAddress1").setReadOnly(false);
+            Ext.getCmp("txtPerAddress2").setReadOnly(false);
+            Ext.getCmp("txtPerAddress3").setReadOnly(false);
+            Ext.getCmp("drpPerDistrictID").setReadOnly(false);
+            Ext.getCmp("drpPerStateID").setReadOnly(false);
+            Ext.getCmp("txtParmanentPIN").setReadOnly(false);
+        }
+
+    }
+
+
+    var validateForm = function () {
+
+        if (App.txtFirstName.getValue() == null || App.txtFirstName.getValue() == '') { Ext.Msg.alert('Validation Failed', 'First Name is Mandatory and must be provided'); return false; }
+
+        var regex = /^[a-zA-Z ]*$/;
+        if (!regex.test(App.txtFirstName.getValue() || App.txtMiddleName.getValue())) {
+
+            Ext.Msg.alert('Validation Failed', 'First name should be alphabets only');
+            return false;
+        }
+        if (!regex.test(App.txtMiddleName.getValue())) {
+
+            Ext.Msg.alert('Validation Failed', 'Middle name should be alphabets only');
+            return false;
+        }
+        if (!regex.test(App.txtLastName.getValue())) {
+
+            Ext.Msg.alert('Validation Failed', 'Last name should be alphabets only');
+            return false;
+        }
+        if (App.txtFatherName.getValue() == null || App.txtFatherName.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Father/Husband Name is Mandatory and must be provided'); return false; }
+
+        if (!regex.test(App.txtFatherName.getValue())) {
+
+            Ext.Msg.alert('Validation Failed', 'Father/Husband name should be alphabets only');
+            return false;
+        }
+
+
+        if (App.txtMotherName.getValue() == null || App.txtMotherName.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Mother Name is Mandatory and must be provided'); return false; }
+
+        if (!regex.test(App.txtMotherName.getValue())) {
+
+            Ext.Msg.alert('Validation Failed', 'Mother name should be alphabets only');
+            return false;
+        }
+
+        if (App.txtDOB.getValue() == null || App.txtDOB.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Date field for Date Of Birth is Mandatory and must be provided'); return false; }
+
+        var dateString = App.txtDOB.getValue();
+        var myDate = new Date(dateString);
+        var mydt = myDate.getFullYear();
+        debugger;
+        if (mydt < 1960) {
+            Ext.Msg.alert('Validation Failed', 'Date of birth should not less than 1960');
+            return false;
+        }
+
+
+        if (App.Rbtn_Married.getValue() == false && App.Rbtn_UnMarried.getValue() == false)
+        { Ext.Msg.alert('Validation Failed', 'Please indicate your Marital Status'); return false; }
+
+        if (App.Male.getValue() == false && App.Female.getValue() == false && App.Transgender.getValue() == false)
+        { Ext.Msg.alert('Validation Failed', 'Please indicate your Gender'); return false; }
+
+        if (!App.txtEmail.isValid() || App.txtEmail.getValue() == '' || App.txtEmail.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide the valid Email Address'); return false; }
+
+        if (App.txtmobileNumber.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide the Mobile Number'); return false; }
+
+        if (App.PRB.getValue() == false && App.NPRB.getValue() == false)
+        { Ext.Msg.alert('Validation Failed', 'Please indicate your permanent resident of Bihar Status'); return false; }
+
+        if (App.ReservationQuota_Yes.getValue() == false && App.ReservationQuota_No.getValue() == false)
+        { Ext.Msg.alert('Validation Failed', 'Please indicate your Reservation Quota'); return false; }
+
+        if (App.ReservationQuota_Yes.getValue() == 1) {
+            var vCastType = 0;
+            if (App.ReservationQuotaName_02.getValue())
+                vCastType = 2;
+            else if (App.ReservationQuotaName_03.getValue())
+                vCastType = 3;
+            else if (App.ReservationQuotaName_04.getValue())
+                vCastType = 4;
+            else if (App.ReservationQuotaName_05.getValue())
+                vCastType = 5;
+
+            if (vCastType == 0) { Ext.Msg.alert('Validation Failed', 'Please indicate the Cast Category Code'); return false; }
+        }
+        if ((App.txtCategoryname.getValue() == '' || App.txtCategoryname.getValue() == null) && App.ReservationQuota_Yes.getValue() == 1 && App.IsCastNameRequired.getValue() == 1)
+        { Ext.Msg.alert('Validation Failed', 'Please Enter caste Name'); return false; }
+
+        //if (App.IsExArmy_Yes.getValue() == false && App.IsExArmy_No.getValue() == false)
+        //{ Ext.Msg.alert('Validation Failed', 'Please indicate your Ex-Serviceman Status'); return false; }
+
+
+        if (App.RequiredCriteria_Yes.getValue() == false && App.RequiredCriteria_No.getValue() == false)
+        { Ext.Msg.alert('Validation Failed', 'Please indicate required criteria Status'); return false; }
+
+
+
+        if (App.txtmobileNumber.getValue() < 1000000000 || App.txtmobileNumber.getValue() > 9999999999) {
+            Ext.Msg.alert('Validation Failed', 'Please provide a valid  Mobile Number');
+            return false;
+        }
+
+
+        if (App.IsEligibleForConcession.getValue() == 1 && App.CONCESSIONAL_FEE_YES.getValue() == false && App.CONCESSIONAL_FEE_NO.getValue() == false) {
+            Ext.Msg.alert('Validation Failed', 'Do you want to pay  concessional fee yes/no ?');
+            return false;
+        }
+
+        if (App.handicapped_Yes.getValue() == 1 && App.handicappedType_Blindness.getValue() == false && App.handicappedType_HearingLossandDeafness.getValue() == false && App.handicappedType_PhysicalDisability.getValue() == false && App.handicappedType_MentalDisorder.getValue() == false) {
+
+            Ext.Msg.alert('Validation Failed', 'Please select nature of disability');
+            return false;
+        }
+
+        if (App.handicapped_Yes.getValue() == 1 && App.handicappedPercentage_40PercentageOrGreater.getValue() == false && App.handicappedPercentage_lessthen40Percentage.getValue() == false) {
+
+            Ext.Msg.alert('Validation Failed', 'Please select percentage of disability');
+            return false;
+        }
+
+
+        if (App.txtCorAddress1.getValue() == '' || App.txtCorAddress1.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Address Line 1'); return false; }
+        if (App.drpStateID.getValue() == '' || App.drpStateID.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide  State'); return false; }
+        if (App.txtPINCODE.getValue() == '' || App.txtPINCODE.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide PIN'); return false; }
+
+        if (App.drpStateID.getValue() == 5) {
+            if (App.drpDistrictID.getValue() == '' || App.drpDistrictID.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide District'); return false; }
+        }
+
+
+        if (App.txtPerAddress1.getValue() == '' || App.txtPerAddress1.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Permanent Address Line 1'); return false; }
+        if (App.drpPerStateID.getValue() == '' || App.drpPerStateID.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Permanent State'); return false; }
+
+        if (App.drpPerStateID.getValue() == 5) {
+            if (App.drpPerDistrictID.getValue() == '' || App.drpPerDistrictID.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Permanent District'); return false; }
+        }
+
+        if (App.txtPerPINCODE.getValue() == '' || App.txtPerPINCODE.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Permanent PIN'); return false; }
+
+
+
+        return true;
+    }
+
+
+    var enabledisable = function () {
+
+        if (App.handicapped_Yes.getValue() != 1) {
+            Ext.getCmp("handicappedType_Blindness").setReadOnly(true);
+            Ext.getCmp("handicappedType_MentalDisorder").setReadOnly(true);
+            Ext.getCmp("handicappedType_HearingLossandDeafness").setReadOnly(true);
+            Ext.getCmp("handicappedType_PhysicalDisability").setReadOnly(true);
+            Ext.getCmp("handicappedPercentage_40PercentageOrGreater").setReadOnly(true);
+            Ext.getCmp("handicappedPercentage_lessthen40Percentage").setReadOnly(true);
+
+            Ext.getCmp("handicappedType_Blindness").setValue(false);
+            Ext.getCmp("handicappedType_MentalDisorder").setValue(false);
+            Ext.getCmp("handicappedType_HearingLossandDeafness").setValue(false);
+            Ext.getCmp("handicappedType_PhysicalDisability").setValue(false);
+            Ext.getCmp("handicappedPercentage_40PercentageOrGreater").setValue(false);
+            Ext.getCmp("handicappedPercentage_lessthen40Percentage").setValue(false);
+        }
+        else {
+            Ext.getCmp("handicappedType_Blindness").setReadOnly(false);
+            Ext.getCmp("handicappedType_MentalDisorder").setReadOnly(false);
+            Ext.getCmp("handicappedType_HearingLossandDeafness").setReadOnly(false);
+            Ext.getCmp("handicappedType_PhysicalDisability").setReadOnly(false);
+            Ext.getCmp("handicappedPercentage_40PercentageOrGreater").setReadOnly(false);
+            Ext.getCmp("handicappedPercentage_lessthen40Percentage").setReadOnly(false);
+        }
+
+
+        //CONCESSIONAL FEE HIDE SHOW LOGIC
+        if (App.PRB.getValue() == 1 && (App.ReservationQuotaName_02.getValue() == 1 || App.ReservationQuotaName_03.getValue() == 1)) {
+
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false)
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false)
+            Ext.getCmp("IsEligibleForConcession").setValue(1);
+            document.getElementById("TR_Con_Fee_Level").style.display = "block";
+            document.getElementById("TR_Con_Fee").style.display = "block";
+            document.getElementById("TR_Con_Fee_msg").style.display = "block";
+        }
+        else {
+            Ext.getCmp("IsEligibleForConcession").setValue(0);
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false)
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false)
+        }
+
+
+        if (App.ReservationQuota_No.getValue() == 1 && App.handicappedPercentage_40PercentageOrGreater.getValue() == 1) {
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false)
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false)
+            Ext.getCmp("IsEligibleForConcession").setValue(1);
+            document.getElementById("TR_Con_Fee_Level").style.display = "block";
+            document.getElementById("TR_Con_Fee").style.display = "block";
+            document.getElementById("TR_Con_Fee_msg").style.display = "block";
+        }
+        else {
+            Ext.getCmp("IsEligibleForConcession").setValue(0);
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false)
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false)
+        }
+
+
+        if (App.ReservationQuota_No.getValue() == 1 && App.handicappedPercentage_40PercentageOrGreater.getValue() != 1) {
+            Ext.getCmp("IsEligibleForConcession").setValue(0);
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false)
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false)
+            document.getElementById("TR_Con_Fee_Level").style.display = "none";
+            document.getElementById("TR_Con_Fee").style.display = "none";
+            document.getElementById("TR_Con_Fee_msg").style.display = "none";
+        }
+
+
+        if ((App.ReservationQuotaName_04.getValue() == 1 || App.ReservationQuotaName_05.getValue() == 1) && App.handicappedPercentage_40PercentageOrGreater.getValue() == 1) {
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false)
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false)
+            Ext.getCmp("IsEligibleForConcession").setValue(1);
+            document.getElementById("TR_Con_Fee_Level").style.display = "block";
+            document.getElementById("TR_Con_Fee").style.display = "block";
+            document.getElementById("TR_Con_Fee_msg").style.display = "block";
+        }
+        else {
+            Ext.getCmp("IsEligibleForConcession").setValue(0);
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false)
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false)
+        }
+
+
+        if ((App.ReservationQuotaName_04.getValue() == 1 || App.ReservationQuotaName_05.getValue() == 1) && App.handicappedPercentage_40PercentageOrGreater.getValue() != 1) {
+            Ext.getCmp("IsEligibleForConcession").setValue(0);
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false)
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false)
+            document.getElementById("TR_Con_Fee_Level").style.display = "none";
+            document.getElementById("TR_Con_Fee").style.display = "none";
+            document.getElementById("TR_Con_Fee_msg").style.display = "none";
+        }
+        //**END OF CONCESSIONAL FEE HIDE SHOW LOGIC
+
+
+        if (App.PRB.getValue() != 1) {
+            Ext.getCmp("ReservationQuota_Yes").setReadOnly(true);
+            Ext.getCmp("ReservationQuota_No").setReadOnly(true);
+
+            Ext.getCmp("ReservationQuota_No").setValue(true);
+            Ext.getCmp("ReservationQuota_Yes").setValue(false);
+
+            Ext.getCmp("IsFreedomFighter_Yes").setReadOnly(true);
+            Ext.getCmp("IsFreedomFighter_No").setReadOnly(true);
+
+            Ext.getCmp("IsFreedomFighter_No").setValue(true);
+            Ext.getCmp("IsFreedomFighter_Yes").setValue(false);
+
+            Ext.getCmp("ReservationQuotaName_02").setReadOnly(true);
+            Ext.getCmp("ReservationQuotaName_03").setReadOnly(true);
+            Ext.getCmp("ReservationQuotaName_04").setReadOnly(true);
+            Ext.getCmp("ReservationQuotaName_05").setReadOnly(true);
+            //Ext.getCmp("txtCategoryname").setReadOnly(true);            
+
+            Ext.getCmp("ReservationQuotaName_02").setValue(false);
+            Ext.getCmp("ReservationQuotaName_03").setValue(false);
+            Ext.getCmp("ReservationQuotaName_04").setValue(false);
+            Ext.getCmp("ReservationQuotaName_05").setValue(false);
+            //Ext.getCmp("txtCategoryname").setValue('');
+
+            //Ext.getCmp("txtCastName").setReadOnly(true);
+            //App.txtCastName.setValue('');
+        }
+        else {
+            Ext.getCmp("ReservationQuota_Yes").setReadOnly(false);
+            Ext.getCmp("ReservationQuota_No").setReadOnly(false);
+
+            Ext.getCmp("IsFreedomFighter_Yes").setReadOnly(false);
+            Ext.getCmp("IsFreedomFighter_No").setReadOnly(false);
+
+            Ext.getCmp("ReservationQuotaName_02").setReadOnly(false);
+            Ext.getCmp("ReservationQuotaName_03").setReadOnly(false);
+            Ext.getCmp("ReservationQuotaName_04").setReadOnly(false);
+            Ext.getCmp("ReservationQuotaName_05").setReadOnly(false);
+            //Ext.getCmp("txtCategoryname").setReadOnly(false);
+
+            Ext.getCmp("ReservationQuotaName_02").setValue(0);
+            Ext.getCmp("ReservationQuotaName_03").setValue(0);
+            Ext.getCmp("ReservationQuotaName_04").setValue(0);
+            Ext.getCmp("ReservationQuotaName_05").setValue(0);
+            //Ext.getCmp("txtCategoryname").setValue('');
+
+            //Ext.getCmp("txtCastName").setReadOnly(false);    
+        }
+
+
+        if (App.ReservationQuota_Yes.getValue() != 1) {
+            Ext.getCmp("ReservationQuotaName_02").setReadOnly(true);
+            Ext.getCmp("ReservationQuotaName_03").setReadOnly(true);
+            Ext.getCmp("ReservationQuotaName_04").setReadOnly(true);
+            Ext.getCmp("ReservationQuotaName_05").setReadOnly(true);
+
+            Ext.getCmp("txtCategoryname").setReadOnly(true);
+
+            Ext.getCmp("ReservationQuotaName_02").setValue(false);
+            Ext.getCmp("ReservationQuotaName_03").setValue(false);
+            Ext.getCmp("ReservationQuotaName_04").setValue(false);
+            Ext.getCmp("ReservationQuotaName_05").setValue(false);
+            Ext.getCmp("txtCategoryname").setValue('');
+
+            //Ext.getCmp("txtCastName").setReadOnly(true);
+            //App.txtCastName.setValue('');
+        }
+        else {
+            Ext.getCmp("ReservationQuota_Yes").setReadOnly(false);
+            Ext.getCmp("ReservationQuota_No").setReadOnly(false);
+
+            Ext.getCmp("ReservationQuotaName_02").setReadOnly(false);
+            Ext.getCmp("ReservationQuotaName_03").setReadOnly(false);
+            Ext.getCmp("ReservationQuotaName_04").setReadOnly(false);
+            Ext.getCmp("ReservationQuotaName_05").setReadOnly(false);
+
+            Ext.getCmp("txtCategoryname").setReadOnly(false);
+            //Ext.getCmp("txtCastName").setReadOnly(false);
+        }
+
+
+        if (App.RequiredCriteria_Yes.getValue() == false) {
+            Ext.getCmp('btnEmailVerify').setDisabled(true);
+            Ext.getCmp('btnMobileVerify').setDisabled(true);
+            Ext.getCmp('btnSubmitForm').setDisabled(true);
+        }
+        else {
+            Ext.getCmp('btnEmailVerify').setDisabled(false);
+            Ext.getCmp('btnMobileVerify').setDisabled(false);
+            Ext.getCmp('btnSubmitForm').setDisabled(false);
+        }
+
+
+        if (App.RequiredCriteria_No.getValue() == 1) {
+            document.getElementById('trRequiredCriteriaMsg').style.display = "block";
+        }
+        else {
+            document.getElementById('trRequiredCriteriaMsg').style.display = "none";
+        }
+
+        //===================Concession for Female candiate of Bihar================//
+        if (App.examTypeID.getValue() != 4 && App.PRB.getValue() == 1 && App.Female.getValue() == 1) {
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false);
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false);
+            Ext.getCmp("IsEligibleForConcession").setValue(1);
+            document.getElementById("TR_Con_Fee_Level").style.display = "block";
+            document.getElementById("TR_Con_Fee").style.display = "block";
+            document.getElementById("TR_Con_Fee_msg").style.display = "block";
+        }
+        else {
+            Ext.getCmp("IsEligibleForConcession").setValue(0);
+            Ext.getCmp("CONCESSIONAL_FEE_YES").setValue(false);
+            Ext.getCmp("CONCESSIONAL_FEE_NO").setValue(false);
+        }
+        //==================================End=====================================//
+    }
+
+
+    var submitData = function () {
+
+        var vhandicappedType = 0;
+        if (App.handicappedType_Blindness.getValue())
+            vhandicappedType = 1;
+        if (App.handicappedType_HearingLossandDeafness.getValue())
+            vhandicappedType = 2;
+        if (App.handicappedType_PhysicalDisability.getValue())
+            vhandicappedType = 3;
+        if (App.handicappedType_MentalDisorder.getValue())
+            vhandicappedType = 4;
+
+
+
+        if (App.PRB.getValue() == 1 && (App.ReservationQuotaName_02.getValue() == 1 || App.ReservationQuotaName_03.getValue() == 1)) {
+            App.IsEligibleForConcession.setValue(1)
+        }
+        if (App.PRB.getValue() == 1 && App.ReservationQuota_No.getValue() == 1 && App.handicappedPercentage_40PercentageOrGreater.getValue() == 1) {
+            App.IsEligibleForConcession.setValue(1)
+        }
+        if (App.PRB.getValue() == 1 && (App.ReservationQuotaName_04.getValue() == 1 || App.ReservationQuotaName_05.getValue() == 1) && App.handicappedPercentage_40PercentageOrGreater.getValue() == 1) {
+            App.IsEligibleForConcession.setValue(1)
+        }
+        if (App.PRB.getValue() == 1 && (App.ReservationQuotaName_04.getValue() == 1 || App.ReservationQuotaName_05.getValue() == 1) && App.handicappedPercentage_40PercentageOrGreater.getValue() == 1) {
+            App.IsEligibleForConcession.setValue(1)
+        }
+        if (App.handicappedPercentage_40PercentageOrGreater.getValue() == 1 && App.handicapped_Yes.getValue() == 1) {
+            App.IsEligibleForConcession.setValue(1)
+        }
+
+
+
+        if (!validateForm())
+            return false;
+
+        var vCastType = 1; // for general by default
+        if (App.ReservationQuotaName_02.getValue())
+            vCastType = 2;
+        else if (App.ReservationQuotaName_03.getValue())
+            vCastType = 3;
+        else if (App.ReservationQuotaName_04.getValue())
+            vCastType = 4;
+        else if (App.ReservationQuotaName_05.getValue())
+            vCastType = 5;
+
+
+
+        var V_genderType = 0;
+        if (App.Male.getValue())
+            V_genderType = 1;
+        if (App.Female.getValue())
+            V_genderType = 2;
+        if (App.Transgender.getValue())
+            V_genderType = 3;
+
+        var txtAdharNo = $('#AdharNo').val();
+        //Adhar Encription Start
+        debugger;
+        var str = '';
+        var i;
+        for (i = 0; i < 16; i++) {
+            debugger;
+            var number = Math.floor(Math.random() * 10) % 10;
+            str += number;
+        }
+        var key = CryptoJS.enc.Utf8.parse(str);
+        var iv = CryptoJS.enc.Utf8.parse(str);
+
+        var encryptedtxtAdharNo = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(App.txtAdharNo.getValue()), key,
+
+        { keySize: 128 / 8, iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+
+        $('#hdAdharNo').val(encryptedtxtAdharNo);
+        $('#HDStr').val(str);
+
+        //---------------------------
+
+
+        var data = {
+
+            FirstName: App.txtFirstName.getValue(),
+            MiddleName: App.txtMiddleName.getValue(),
+            LastName: App.txtLastName.getValue(),
+            FatherName: App.txtFatherName.getValue(),
+            MotherName: App.txtMotherName.getValue(),
+
+            IsExAmry: App.IsExArmy_Yes.getValue() ? 1 : 0,
+
+            DOBDate: ((App.txtDOB.getValue().getYear() + 1900) + '-' + (App.txtDOB.getValue().getMonth() + 1) + '-' + App.txtDOB.getValue().getDate() + ' 00:00:00.000'),
+            Gender: V_genderType,
+            IsMarried: App.Rbtn_Married.getValue() ? 1 : 0,
+
+            Email: App.txtEmail.getValue(),
+            Mobile: App.txtmobileNumber.getValue(),
+
+            AdharNo: '',//App.txtAdharNo.getValue(),
+
+            IsFreedomFighter: App.IsFreedomFighter_Yes.getValue() ? 1 : 0,
+
+            IsBihar: App.PRB.getValue() ? 1 : 0,
+            IsIndian: App.IsIndian_Yes.getValue() ? 1 : 0,
+
+
+
+            IsReservationQuota: App.ReservationQuota_Yes.getValue() ? 1 : 0,
+            CastType: vCastType,
+            CastName: App.txtCategoryname.getValue(),
+            //CastName: App.txtCastName.getValue(),
+
+
+            IsHandicapped: App.handicapped_Yes.getValue() ? 1 : 0,
+            HandicapNature: vhandicappedType,
+            HandicapPercent: App.handicappedPercentage_40PercentageOrGreater.getValue() ? 1 : (App.handicappedPercentage_lessthen40Percentage.getValue() ? 2 : 0),
+
+            IsEligibleConcessionalFee: App.IsEligibleForConcession.getValue(),
+            IsTakenConcessionalFee: App.CONCESSIONAL_FEE_YES.getValue() ? 1 : 0,
+
+
+
+            IsRequiredCriteria: App.RequiredCriteria_Yes.getValue() ? 1 : 0,
+
+            CorAddr1: App.txtCorAddress1.getValue(),
+            CorAddr2: App.txtCorAddress2.getValue(),
+            CorAddr3: App.txtCorAddress3.getValue(),
+            CorStateId: App.drpStateID.getValue(),
+            CorDistrictId: App.drpDistrictID.getValue() == null ? 0 : (App.drpDistrictID.getValue() == '' ? 0 : App.drpDistrictID.getValue()),
+
+
+
+            CorPINCODE: App.txtPINCODE.getValue(),
+
+            IsSameAddress: App.chkSameAsAbove.checked,
+
+            PerAddress1: App.txtPerAddress1.getValue(),
+            PerAddress2: App.txtPerAddress2.getValue(),
+            PerAddress3: App.txtPerAddress3.getValue(),
+            PerDistrictID: App.drpPerDistrictID.getValue() == null ? 0 : (App.drpPerDistrictID.getValue() == '' ? 0 : App.drpPerDistrictID.getValue()),
+
+
+
+            PerStateID: App.drpPerStateID.getValue(),
+            PerPINCODE: App.txtPerPINCODE.getValue(),
+
+            registrationExamId: App.registrationExamId.getValue()
+
+        };
+
+        Ext.Msg.confirm('Confirmation ', 'I have checked all the entries no further correction is required. Submission be accepted ?',
+          function (btn) {
+              if (btn === 'yes') {
+
+                  Ext.Msg.wait('Saving. Please wait...', 'Saving...');
+                  console.log(JSON.stringify(data));
+
+                  App.direct.saveRegistrationForm(JSON.stringify(data), App.txtVerifyEmail.getValue(), App.txtVerifyMobile.getValue(), document.getElementById('CaptchaText').value,
+                      App.registrationExamId.getValue(), App.txtEmail.getValue(), App.txtmobileNumber.getValue(), document.getElementById('HDStr').value, document.getElementById('hdAdharNo').value, {
+                          timeout: 999999,
+                          success: function (result) {
+                              debugger;
+                              document.getElementById('section1').style.display = "none";
+                              document.getElementById('section2').style.display = "block";
+                              document.getElementById('ActionSection').style.display = "none";
+                              document.getElementById('UserNamePlaceHolder').innerHTML = '<b>' + result.data[0] + '</b>';
+                              document.getElementById('PasswordPlaceHolder').innerHTML = '<b>' + result.data[1] + '</b>';
+                              document.getElementById('RegNoPlaceHolder').innerHTML = '<b>' + result.data[2] + '</b>';
+                              document.getElementById('ExamNamePlaceHolder').innerHTML = '<b>' + result.data[3] + '</b>';
+
+                              Ext.Msg.hide();
+                          },
+                          failure: function (result) {
+                              Ext.Msg.alert('Please try again.', result);
+                              document.getElementById('cID').src = "/AdmissionProcess/ApplicantRegistrationForm/GetCaptchaImage" + "/" + (new Date()).getTime();
+                        }
+                        });
+
+                    return true;
+                } else {
+                    return false;
+                }
+          });
+
+
+    }
+
+        var validateSendOtp = function () {
+            //alert(App.txtmobileNumber.getValue());
+            if (App.txtFirstName.getValue() == null || App.txtFirstName.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Please provide the First Name'); return false; }
+            if (App.txtFatherName.getValue() == null || App.txtFatherName.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Father/Husband Name is Mandatory and must be provided'); return false; }
+            if (App.txtMotherName.getValue() == null || App.txtMotherName.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Mother Name is Mandatory and must be provided'); return false; }
+            if (App.txtDOB.getValue() == null || App.txtDOB.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Date field for Date Of Birth is Mandatory and must be provided'); return false; }
+            if (App.Rbtn_Married.getValue() == false && App.Rbtn_UnMarried.getValue() == false)
+            { Ext.Msg.alert('Validation Failed', 'Please indicate your Marital Status'); return false; }
+            if (App.Male.getValue() == false && App.Female.getValue() == false && App.Transgender.getValue() == false)
+            { Ext.Msg.alert('Validation Failed', 'Please indicate your Gender'); return false; }
+            if (App.txtCorAddress1.getValue() == '' || App.txtCorAddress1.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Address Line 1'); return false; }
+            if (App.drpStateID.getValue() == '' || App.drpStateID.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide  State'); return false; }
+            if (App.txtPINCODE.getValue() == '' || App.txtPINCODE.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide PIN'); return false; }
+            if (App.drpStateID.getValue() == 5) {
+                if (App.drpDistrictID.getValue() == '' || App.drpDistrictID.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide District'); return false; }
+            }
+            if (App.txtPerAddress1.getValue() == '' || App.txtPerAddress1.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Permanent Address Line 1'); return false; }
+            if (App.drpPerStateID.getValue() == '' || App.drpPerStateID.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Permanent State'); return false; }
+
+            if (App.drpPerStateID.getValue() == 5) {
+                if (App.drpPerDistrictID.getValue() == '' || App.drpPerDistrictID.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Permanent District'); return false; }
+            }
+            if (App.txtPerPINCODE.getValue() == '' || App.txtPerPINCODE.getValue() == null) { Ext.Msg.alert('Validation Failed', 'Please provide Permanent PIN'); return false; }
+
+
+            return true;
+        }
+
+        var getOtp = function () {
+            //debugger;
+            if (App.txtmobileNumber.getValue() == null || App.txtmobileNumber.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Please provide the Mobile Number'); return false; }
+            if (!validateSendOtp())
+                return false;
+
+            Ext.Msg.wait('Sending. Please wait....', 'Sending...');
+            App.direct.SendOTP(App.txtmobileNumber.getValue(), App.registrationExamId.getValue(), {
+                success: function (result) {
+                    Ext.Msg.alert('Alert', 'OTP sent successfully ...');
+                    //Ext.Msg.hide();
+                    App.btnMobileVerify.Text = ("Re Send OTP");
+                    Ext.getCmp('btnMobileVerify').hide(true);
+
+                },
+                failure: function (result) {
+                    debugger;
+                    Ext.Msg.alert('Error!!!', result);
+                }
+            });
+        }
+
+        var getOtpEmail = function () {
+
+            if (App.txtEmail.getValue() == null || App.txtEmail.getValue() == '') { Ext.Msg.alert('Validation Failed', 'Please provide the Email Address'); return false; }
+
+            if (!App.txtEmail.isValid()) {
+                alert('Please Enter a Valid Email Address');
+                return false;
+            }
+
+            if (!validateSendOtp())
+                return false;
+
+            Ext.Msg.wait('Sending. Please wait....', 'Sending...');
+            App.direct.SendMailOTP(App.txtEmail.getValue(), App.registrationExamId.getValue(), {
+                success: function (result) {
+                    Ext.Msg.alert('Alert', 'OTP sent successfully ...');
+                    //Ext.Msg.hide();                 
+                    Ext.getCmp('btnEmailVerify').hide(true);
+
+
+                },
+                failure: function (result) {
+                    debugger;
+                    Ext.Msg.alert('Error!!!', result);
+                }
+            });
+
+        }
+
+        var onStateSelect = function () {
+
+            var StateID = App.drpStateID.getValue() //stateid = 5 == bihar          
+            if (StateID == 5) {
+                document.getElementById('tdDistrictLableid').style.display = "block";
+                document.getElementById('tdDistrictid').style.display = "block";
+            }
+            else {
+                document.getElementById('tdDistrictLableid').style.display = "none";
+                document.getElementById('tdDistrictid').style.display = "none";
+            }
+
+            App.drpDistrictID.clearValue();
+            App.drpDistrictID.getStore().load();
+
+        }
+
+        var onPerStateSelect = function () {
+
+            var PerStateID = App.drpPerStateID.getValue() //stateid = 5 == bihar          
+            if (PerStateID == 5) {
+                document.getElementById('tdPerDistrictLableid').style.display = "block";
+                document.getElementById('tdPerDistrictid').style.display = "block";
+            }
+            else {
+                document.getElementById('tdPerDistrictLableid').style.display = "none";
+                document.getElementById('tdPerDistrictid').style.display = "none";
+            }
+
+            App.drpPerDistrictID.clearValue();
+            App.drpPerDistrictID.getStore().load();
+
+        }
+
+        MyApp = (function () {
+            return {
+                init: function () {
+                    document.getElementById("trRequiredCriteriaMsg").style.display = "none";
+                    document.getElementById("TD_abcd").style.display = "none";
+
+                    document.getElementById("TR_Con_Fee_Level").style.display = "none";
+                    document.getElementById("TR_Con_Fee").style.display = "none";
+                    document.getElementById("TR_Con_Fee_msg").style.display = "none";
+
+                    Ext.getCmp("handicappedType_Blindness").setReadOnly(true);
+                    Ext.getCmp("handicappedType_MentalDisorder").setReadOnly(true);
+
+                    Ext.getCmp("handicappedType_HearingLossandDeafness").setReadOnly(true);
+                    Ext.getCmp("handicappedType_PhysicalDisability").setReadOnly(true);
+                    Ext.getCmp("handicappedPercentage_40PercentageOrGreater").setReadOnly(true);
+                    Ext.getCmp("handicappedPercentage_lessthen40Percentage").setReadOnly(true);
+
+
+                    if (App.IsCastNameRequired.getValue() == 0) {
+                        document.getElementById("TR_CasteName_1").style.display = "none";
+                        //document.getElementById("TR_CasteName_2").style.display = "none";
+                    }
+                    if (App.IsCastNameRequired.getValue() == 1) {
+                        //alert(App.IsCastNameRequired.getValue());
+                        document.getElementById("TR_CasteName_1").style.display = "table-row";
+                        //document.getElementById("TR_CasteName_2").style.display = "block";
+                    }
+
+                }
+            };
+        })();
+
+        Ext.onReady(MyApp.init, MyApp);
+
+
+
+        //onload = (function () {
+        //    $('#txtmobileNumber').keypress(function () {
+        //        if (this.value.length < 11) {
+        //            return this.value
+        //        }
+        //        else
+        //            true
+
+        //    })
+        //})();
+
+</script>
+<body>
+
+   
+
+
+        
+    <div  id="section1">    
+    <table align="center" class="maincontainer" border="0">
+        <tr>
+            <td colspan="2">
+                 
+                                          <table class="FirstRow"" align="center" border="0">
+                                          <tr>
+                                          <td align="left"><img src="/resources/images/logo.png" style="width:170px;height:50px" alt=""></td>
+                                          <td align="center" colspan="0" class="heading">
+                                              REGISTRATION FORM
+                                          </td>
+                                          </tr>
+                                          </table>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+            <table class="middle" align="center" border="0">
+            <tr>
+            <td align="left" colspan="0">Advertisement Number:</td>
+            <td>
+            <div id="App.AdvertisementNumber_Container"></div>
+            <div id="App.registrationExamId_Container"></div>
+            <div id="App.examTypeID_Container"></div>
+            </td>
+         </tr>
+         <tr>
+            <td align="left" colspan="0">
+            Name of Post:
+            </td>
+            <td>
+            <div id="App.NameofthePost_Container"></div>
+            </td>
+            </tr>
+            </table>
+            </td>
+        </tr>
+        <tr style="height:15px">
+            <td colspan="2" align="center" style="height:7px">'<span class="req">*</span>' <font size="2px" color="#0066CC"> FIELD IS MANDATORY, CANDIDATE MUST FILL ALL THE COLUMNS IN ENGLISH.</font></td>
+        </tr>
+        <tr>
+             <td>
+            
+                 <table class="middle" align="center" border="0">
+                                        
+
+                                         <tr>
+                                          <td align="left" colspan="0" style="text-transform: uppercase">
+                                          Candidate First Name: <span class="req">*</span> 
+                                          </td>
+                                          <td style="text-transform: uppercase">
+                                          <div id="App.txtFirstName_Container"></div> 
+                                          </td>
+                                          </tr>
+
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          Candidate Middle Name: 
+                                          </td>
+                                          <td>
+                                          <div id="App.txtMiddleName_Container"></div> 
+                                          </td>
+                                          </tr>
+
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          Candidate Last Name: 
+                                          </td>
+                                          <td>
+                                          <div id="App.txtLastName_Container"></div> 
+                                          </td>
+                                          </tr>
+
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          Father's / Husband's Name : <span class="req">*</span>
+                                          </td>
+                                          <td>
+                                          <div id="App.txtFatherName_Container"></div> 
+                                          </td>
+                                          </tr>
+
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          Mother's Name: <span class="req">*</span>
+                                          </td>
+                                          <td>
+                                          <div id="App.txtMotherName_Container"></div> 
+                                          </td>
+                                          </tr>
+
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          Date of Birth: <span class="req">*</span>
+                                          </td>
+                                          <td align="left" class="gridcellstyle">
+                                          <div id="App.txtDOB_Container"></div>
+
+                                          </td>
+                                          </tr>
+
+
+                                        <tr>
+                                            <td align="left" colspan="0">
+                                                 Marital Status : <span class="req">*</span>
+                                           </td>
+                                       
+
+                                        <td align="left" class="gridcellstyle">
+                                           
+
+                                                <div id="App.MaritalStatus_Container"></div>
+                                        </td> 
+                                        </tr>
+                                        <tr>
+                                          <td align="left" colspan="0">
+                                          Gender:<span class="req">*</span> 
+                                          </td>
+                                          <td>
+                                          
+                                            <div id="App.Gender_Container"></div>
+
+                                          </td>
+                                          </tr>
+                                      <tr><td colspan="2" id ="TD_abcd"><div id="App.txtStopText_Container"></div> </td></tr>
+
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          E-Mail: <span class="req">*</span>
+                                          </td>
+                                          <td>
+                                          <div id="App.txtEmail_Container"></div> 
+                                          </td>
+                                          </tr>
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          Mobile No: <span class="req">*</span><span style="float:right">+91</span>
+                                          </td>
+                                          <td>
+                                          <div id="App.txtmobileNumber_Container"></div> 
+
+                                          
+                                          </td>
+                                          </tr>
+                                           
+                                         <tr>
+                                          <td align="left" colspan="0">Aadhaar No: </td>
+                                          <td> <div id="App.txtAdharNo_Container"></div>  
+                                              <input type="hidden" id="hdAdharNo" />
+                                              <input type="hidden" id="HDStr" />
+                                          </td>
+                                          </tr>
+                                                 
+                                       
+
+
+
+                                            <tr>
+                                                    <td align="left" colspan="0">
+                                                    Are you a citizen of India ?: <span class="req">*</span>
+                                                    </td>
+                                                    <td>
+                                                        <div id="App.IsIndian_Container"></div>
+                                                    </td>
+                                            </tr>
+
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          Are you permanent resident of Bihar? <span class="req">*</span>
+                                          </td>
+                                          <td>
+                                          <div id="App.ParmanentResidenceOfBihar_Container"></div>
+                                          </td>
+                                          </tr>
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                          Do you belong to any Reserved Category? <span class="req">*</span>
+                                          </td>
+                                          <td>
+                                          <div id="App.ReservationQuota_Container"></div>
+                                          </td>
+                                          </tr>
+                                          <tr>
+                                          <td align="left" colspan="0">
+                                           If yes then select the Category Code: <span class="req">*</span>
+                                          </td>
+                                          <td>
+                                          <div id="App.ReservationQuotaName_Container"></div> 
+                                          </td>
+                                          </tr>
+                                          <tr id="TR_CasteName_1">
+                                              <td align="left" colspan="0">Enter Caste Name: <span class="req">*</span>
+                                               <div id="App.IsCastNameRequired_Container"></div>
+                                              </td>
+                                              <td>
+                                              <div id="App.txtCategoryname_Container"></div>
+                                              </td>
+                                          </tr>
+                                       
+                                           <tr id="TR_CasteName_2">
+                                              <td align="left" colspan="2">
+                                               <font color="red" size="2px">( आवेदक अपनी जाति एवं आरक्षित कोटि से पूर्णतः आश्वस्त हों लें , किसी प्रकार की त्रुटि होने पर आरक्षण का दावा मान्य नहीं होगा । ) </font>
+                                              </td>                                         
+                                          </tr>
+                                          <tr>
+                                            <td align="left" colspan="0">
+                                             Are you a grand son/ grand daughter of </br> freedom fighters as per advertisement ? :<span class="req">*</span>
+                                            </td>
+                                            <td>
+                                                <div id="App.IsFreedomFighter_Container"></div>
+                                            </td>
+                                        </tr>
+                                          <tr>
+                                            <td>Are you Physically disabled ?</td>
+                                            <td>
+                                                <div id="App.handicapped_Container"></div>
+                                            </td> 
+                                         </tr>
+                                       <tr>
+                                        <td>If yes, Nature of Disability </td>
+                                        <td colspan="0">
+                                            <div id="App.handicappedType_Container"></div>
+                                        </td> 
+                                     </tr>
+                                     <tr>
+                                         <td colspan="2" style="min-height:30px"></td>
+                                     </tr>
+                          
+                                    <tr>
+                                        <td> Percentage of Disability </td> 
+                                        <td >
+                                            <div id="App.handicappedPercentage_Container"></div>
+                                        </td>                              
+                                    </tr>
+                                     <tr>
+                                         <td colspan="2" style="min-height:30px"></td>
+                                     </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                                <div id="TR_Con_Fee_Level" class="hidediv2" style="width:420px">
+                                                    Do you want to pay concessional fee as per SC/ST/DISABILITY/Female(Bihar) ?
+                                                        <div id="App.IsEligibleForConcession_Container"></div></div>
+                                                <div id="TR_Con_Fee" class="hidediv2" style="padding-top:-3px">
+                                                     
+                                                    <div id="App.CONCESSIONAL_FEE_Container"></div>
+                                                </div>
+                                        </td>                          
+                                    </tr>
+
+                                    <tr>
+                                    <td colspan="2">
+                                        <div id="TR_Con_Fee_msg" class="hidediv">
+                                         
+                                            (If supporting document is not produced, then candidature will be cancelled on ground of less amount of fee paid. )
+                                        </div>
+                                    </td>
+                                    </tr>
+                                              
+                                           <tr style="display:none">
+                                          <td align="left" colspan="0"> 
+                                             Are you an Ex-Serviceman ?
+                                          </td>
+                                          <td>
+                                          <div id="App.IsExArmy_Container"></div>
+                                          </td>
+                                          </tr>
+
+                                         
+                                         
+                                          <tr><td colspan="2">&nbsp;</td></tr>
+                                          
+                                          <tr><td colspan="2">Address of Correspondence <span class="req">*</span> </td></tr>
+                                          <tr>
+                                          <td> Address Line 1: </td>
+                                          <td align="left">
+                                           <div id="App.txtCorAddress1_Container"></div>
+                                          </td> 
+                                          </tr>
+                                          <tr>
+                                          <td> Address Line 2: </td>
+                                          <td align="left">
+                                           <div id="App.txtCorAddress2_Container"></div>
+                                          </td> 
+                                          </tr>
+                                            <tr>
+                                          <td> Address Line 3: </td>
+                                          <td align="left">
+                                           <div id="App.txtCorAddress3_Container"></div>
+                                          </td> 
+                                          </tr>
+
+                                          <tr>
+                                          <td> State: </td>
+                                          <td align="left">
+                                           
+                                             <div id="App.drpStateID_Container"></div>
+
+                                          </td> 
+                                          </tr>
+
+                                          <tr>
+                                          <td colspan="2">
+                                              <div id="tdDistrictLableid" class="hidediv2" style="width:317px;font-weight:normal;"> District: </div> 
+                                          <div align="left" id="tdDistrictid" class="hidediv2">
+                                          
+                                         <div id="App.drpDistrictID_Container"></div>
+
+                                          </div>
+                                              </td>
+                                          </tr>
+
+                                          <tr>
+                                          <td> PIN: </td>
+                                          <td align="left" >
+                                           <div id="App.txtPINCODE_Container"></div>
+                                          </td> 
+                                          </tr>
+
+
+                                        <tr>
+                                            <td colspan="2" align="left" class="border">
+                                                &nbsp;
+                                            </td>
+                                        </tr>
+
+                                        <tr><td >Address of permanent residence <span class="req">*</span> </td>
+                                         <td align="left" width="100">
+                                            
+                                            <div id="App.chkSameAsAbove_Container"></div>
+                                                          
+
+                                        </td>
+                                        </tr>
+                                          <tr>
+                                          <td> Address Line 1: </td>
+                                          <td align="left">
+                                           <div id="App.txtPerAddress1_Container"></div>
+                                          </td> 
+                                          </tr>
+                                          <tr>
+                                          <td> Address Line 2: </td>
+                                          <td align="left">
+                                           <div id="App.txtPerAddress2_Container"></div>
+                                          </td> 
+                                          </tr>
+                                          <tr>
+                                          <td> Address Line 3: </td>
+                                          <td align="left">
+                                           <div id="App.txtPerAddress3_Container"></div>
+                                          </td> 
+                                          </tr>
+
+                                          <tr>
+                                          <td> State: </td>
+                                          <td align="left">
+                                           
+                                             <div id="App.drpPerStateID_Container"></div>
+
+                                          </td> 
+                                          </tr>                                        
+                                          <tr>
+                                          <td id="tdPerDistrictLableid"> District: </td>
+                                          <td align="left" id="tdPerDistrictid">
+                                          
+                                         <div id="App.drpPerDistrictID_Container"></div>
+
+                                          </td> 
+                                          </tr> 
+
+                                          <tr>
+                                          <td> PIN: </td>
+                                          <td align="left">
+                                           <div id="App.txtPerPINCODE_Container"></div>
+                                          </td> 
+                                          </tr>
+
+                                           <tr>
+                                          <td colspan="2" align="left" style="color:red;font-size:14px">Note: If permanent address is outside of Bihar, reservation of SC,ST,EBC & BC will be not acceptable.</td>
+
+                                          </tr>
+
+                                          </table>
+                </td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="2">
+
+                                                    <table class="middle" align="center" border="0">
+                                          
+                                          <tr>
+                                              <td colspan="2">Do you have required essential qualification/criteria for this post as mentioned in the advertisement ? (For details please read the advertisement carefully.) <span class="req">*</span></td>
+                                          </tr>
+                                          <tr>
+                                          <td> Please select:</td>
+                                          <td>
+                                          <div id="App.RequiredCriteria_Container"></div>
+                                          </td>
+                                          </tr> 
+                                          <tr style="height:25px">
+                                                <td colspan="2" id="trRequiredCriteriaMsg"><font color="red">Sorry you are not eligible for the above post, therefore you cannot proceed. </font></td>                                          
+                                          </tr>
+                                          </table>
+                    </td>
+                 </tr>
+                 <tr>
+                    <td align="center" colspan="2">
+                         <fieldset class="Verification" align="left">
+                           <legend class="Legend">Mobile/Mail Verification</legend>
+                           <table align="left" border="0">
+                             <tr>
+                                <td>Click on Get Email Code button to get verification code :</td><td><div id="App.btnEmailVerify_Container"></div></td> 
+                             </tr>
+                             <tr>
+                                <td><div id="App.txtVerifyEmail_Container"></div> </td><td></td></tr>
+                             <tr><td colspan="2"><hr/></td></tr>
+                             <tr>
+                                <td>Click on Get OTP button to get OTP :</td><td><div id="App.btnMobileVerify_Container"></div></td> 
+                             </tr>
+                             <tr>
+                                <td><div id="App.txtVerifyMobile_Container"></div> </td><td></td>
+                             </tr>
+                             </table>
+                        </fieldset>
+
+
+        </td>
+        </tr>
+        <tr>
+        <td align="center" colspan="2">
+
+
+                                          <table class="middle" align="center" border="0">
+                                          <tr>
+                                          <td align="left" style="width:65px"><label id="lblCaptaCode" for="Password">Captcha :</label></td>   
+                                          <td><input type="text" class="textbox" name="txtCaptcha" id="CaptchaText"   autocomplete = "off" placeholder="Enter captcha Code" /></td>
+                                         
+                                          
+                                          <td align="left" style="width:100px">
+                                          <img id="cID" src="/AdmissionProcess/ApplicantRegistrationForm/GetCaptchaImage" alt="image"  />
+                                          </td>
+                                          <td class="captchaposition">
+                                          <input type="image" class="captha" name="button" value="Search" onclick="showUser()" src="/resources/images/RefreshCaptcha.png" style="width:25px;height:25px"/>
+                                          </td>
+                                          <td width="180px"></td>
+                                          </tr>                                                          
+                                          </table>
+            </td>
+            </tr>
+       </table> 
+</div>
+<div style="display:none" id="section2">
+     <table align="center" class="maincontainer" border="0">
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td align="center">
+                            <b><u>Registration Submitted Successfully!!!</u></b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Dear Candidate, <br/>Your Registration has been submitted successfully.
+                            <br/>Exam Name - <span id="ExamNamePlaceHolder"></span>.
+                            <br/>Registration No. - <span id="RegNoPlaceHolder"></span>.                            
+                            <br/>User Name - <span id="UserNamePlaceHolder"></span>. 
+                            <br/>Password - <span id="PasswordPlaceHolder"></span>.  <br/>
+                            You Can Login In bpsc (Bihar Public Service Commission) portal with the provided credentials
+                            <br/><br/><br/><br/>
+                            With Best Wishes,<br/>
+                            Bihar Public Service Commission
+                        </td>
+                    </tr>
+                 </table>   
+            </td>
+        </tr>
+    </table>
+</div> 
+ 
+
+    <div id="ActionSection">
+        <table align="center"> 
+        <tr><td colspan="0" align="right" width="900px">
+            <div id="App.btnSubmitForm_Container"></div>
+            </td></tr>
+            <tr><td>&nbsp;</td></tr>
+            </table>
+   </div>
+
+
+</body>

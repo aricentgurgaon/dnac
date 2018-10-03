@@ -1,0 +1,82 @@
+<head>
+<meta charset="ISO-8859-1">
+<title>template</title>
+</head>
+<div ng-include="'sideNav.html'"></div>
+<div class="container" style="margin-left:220px;">
+			</br>
+			</br>
+			<div class ="col-sm-9 col-sm-offset-2">
+			<div class="form-group">
+					<label class="margin-left-medium col-sm-3"">Template Name<span class="mandatory">*</span></label>
+					<div class="col-sm-3">
+						<input type="text" class="form-control" id="templateName" ng-model="templateName">
+						</input>
+					</div>
+				</div>
+				<br></br>
+				<div class="form-group">
+					<label class="margin-left-medium col-sm-3"">Device Type<span class="mandatory">*</span></label>
+					<div class="col-sm-3">
+						<select class="form-control" id="deviceType" ng-model="deviceType" ng-options= "x for x in deviceTypeList">
+						</select>
+					</div>
+				</div>
+				<br></br>
+				<div class="form-group">
+					<label class="margin-left-medium col-sm-3"">Criteria <span class="mandatory">*</span></label>
+					<div class="col-sm-3">
+						<select class="form-control" id="criteria" ng-model="criteria" ng-options= "x for x in criteriaList">
+						</select>
+					</div>
+				</div>
+				<br>  				
+				<div ng-switch="criteria">
+					<div ng-switch-when="softwareType">
+					<div class="form-group">
+					<label class="margin-left-medium col-sm-3"">Software Type <span class="mandatory">*</span></label>
+					<div class="col-sm-3">
+						<select class="form-control" id="softypecriteria" ng-model="$parent.softypecriteria" ng-options="x for x in softTypeList">
+						</select>
+					</div>
+				</div>
+				</div>
+				<div ng-switch-when="softwareVersion">
+					<div class="form-group">
+					<label class="margin-left-medium col-sm-3"">Software Version<span class="mandatory">*</span></label>
+					<div class="col-sm-3">
+						<select class="form-control" id="sofvercriteria" ng-model="$parent.sofvercriteria" ng-options="x for x in softVersionList">
+						</select>
+					</div>
+				</div>
+				</div>
+				<div ng-switch-when="memorySize">
+					<div class="form-group">
+					<label class="margin-left-medium col-sm-3"">Memory Size<span class="mandatory">*</span></label>
+					<div class="col-sm-3">
+						<select class="form-control" id="memsizecriteria" ng-model="$parent.memsizecriteria" ng-options="x for x in memorySizeList">
+						</select>
+					</div>
+				</div>
+				</div>
+				<div ng-switch-when="reachabilityStatus">
+					<div class="form-group">
+					<label class="margin-left-medium col-sm-3"">Reachability Status<span class="mandatory">*</span></label>
+					<div class="col-sm-3">
+						<select class="form-control" id="reachstatuscriteria" ng-model="$parent.reachstatuscriteria" ng-options="x for x in reachabilityStatus">
+						</select>
+					</div>
+				</div>
+				</div>
+				</div>
+				<br></br> <br></br>
+				<div class="form-group btn-margin-left">
+				<div class="col-sm-3 col-sm-offset-2 btn-margin-right">
+					<button class="btn btn-primary" data-toggle="tooltip" title="Save Template" ng-click="save()">Save Template</button>
+				</div>
+				<div class="col-sm-3">
+					<button class="btn btn-warning" data-toggle="tooltip" title="Reset Details" ng-click="reset()">Reset</button>
+				</div>
+				</div>
+			</div>
+		</div>

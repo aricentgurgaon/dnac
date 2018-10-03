@@ -1,0 +1,26 @@
+<head>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class ="container" style="margin-left:220px;">
+<div>
+      <form ng-submit="formSubmit()" class="form">
+        <div class="col-md-4 left-margin top-margin">
+          <div class="form-group">
+            <input type="text" class="form-control" ng-model="username" placeholder="username" required=""/>
+          </div> 
+ 
+          <div class="form-group">
+            <input type="password" class="form-control" ng-model="password" placeholder="password" required=""/>
+          </div>
+ 
+          <div class="form-group">
+            <button type="submit" class="btn btn-success">Login</button>
+            <span class="text-danger" style="color:red">{{ error }}</span>
+          </div>
+ 
+        </div>
+      </form>
+      </div>
+</div>
+</body>
