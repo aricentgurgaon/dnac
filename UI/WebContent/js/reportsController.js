@@ -8,7 +8,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
 	$scope.myDiagram='';
 	$('#myDiagramDiv').hide();
 	$scope.templateList = [];
-	$scope.hostList =[];
+	//$scope.hostList =[];
 	$scope.hostId ='';
 	$scope.template = '';
 	console.log("inside reports controller");
@@ -41,10 +41,11 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
 	    })
 	    .then(function(response) {
 			console.log(response);
-			for (var i=0;i<response.data.length;i++){
+			/*for (var i=0;i<response.data.length;i++){
 				$scope.hostList.push(response.data[i]._id);
-			}
-			console.log($scope.hostList);
+			}*/
+			$scope.hostId = response.data[0]._id;
+			console.log($scope.hostId);
 	        }, 
 	        function(error) {
 	            // failed

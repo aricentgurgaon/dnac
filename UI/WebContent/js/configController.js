@@ -14,6 +14,8 @@ $scope.buserName = '';
 $scope.bhost = '';
 $scope.bpassword = '';
 $scope.id ='';
+$scope.spark ='';
+$scope.sparkList = [{'sparkId':'123','sparkName':'DNA_POC'},{'sparkId':'456','sparkName':'common Room'},{'sparkId':'789','sparkName':'Any_Name'}];
 
 var generateId = function () {
 	  var text = "";
@@ -37,6 +39,9 @@ $scope.save = function(){
 				host : $scope.bhost,
 				username : $scope.buserName,
 				password : $scope.bpassword
+				},
+			spark:{
+				sparkId : $scope.spark
 				}
 			}
 			
@@ -53,7 +58,7 @@ $scope.save = function(){
 			console.log(response);
 			alert("configuration saved successfully.");
 			$scope.reset();
-			$state.transitionTo('home');
+			$state.transitionTo('config');
 	        }, 
 	        function(response) { // optional
 	            // failed
@@ -61,7 +66,7 @@ $scope.save = function(){
 				console.log("failed to post");
 				alert("Error while saving configuration.");
 				$scope.reset();
-				$state.transitionTo('home');
+				$state.transitionTo('config');
 	        }
 	    );
 	}
@@ -75,5 +80,6 @@ $scope.reset = function(){
 	$scope.bhost = '';
 	$scope.bpassword = '';
 	$scope.id = '';
+	$scope.spark ='';
 }
 });

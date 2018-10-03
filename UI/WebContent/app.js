@@ -15,37 +15,37 @@
     $stateProvider
       .state('login', {
         url : '/login',
-        templateUrl : 'login.html',
+        templateUrl : 'html/login.html',
         controller : 'LoginController'
       })
       .state('about', {
         url : '/about',
-        templateUrl : 'about.html',
+        templateUrl : 'html/about.html',
         controller : 'AboutController',
       })
       .state('config', {
         url : '/config',
-        templateUrl : 'config.html',
+        templateUrl : 'html/config.html',
         controller : 'ConfigController'
       })
       .state('template', {
         url : '/template',
-        templateUrl : 'template.html',
+        templateUrl : 'html/template.html',
         controller : 'TemplateController'
       })
       .state('reports', {
         url : '/reports',
-        templateUrl : 'reports.html',
+        templateUrl : 'html/reports.html',
         controller : 'ReportsController'
       })
     .state('assetmgmt',{
     	url : '/assetmgmt',
-    	templateUrl : 'assetManagement.html',
+    	templateUrl : 'html/assetManagement.html',
     	controller : 'AssetMgmtController'
     })
     .state('devaudittrail',{
     	url : '/audittrail',
-    	templateUrl : 'deviceAuditTrail.html',
+    	templateUrl : 'html/deviceAuditTrail.html',
     	controller : 'DeviceAuditTrailController'
     })
     console.log($stateProvider.state);

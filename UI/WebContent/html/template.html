@@ -2,10 +2,11 @@
 <meta charset="ISO-8859-1">
 <title>template</title>
 </head>
-<div ng-include="'sideNav.html'"></div>
+<div ng-include="'html/sideNav.html'"></div>
 <div class="container" style="margin-left:220px;">
-			</br>
-			</br>
+<div class = "col-sm-4"><h3>Compliance Template</h3></div>
+			<br>
+			<br>
 			<div class ="col-sm-9 col-sm-offset-2">
 			<div class="form-group">
 					<label class="margin-left-medium col-sm-3"">Template Name<span class="mandatory">*</span></label>
@@ -16,7 +17,7 @@
 				</div>
 				<br></br>
 				<div class="form-group">
-					<label class="margin-left-medium col-sm-3"">Device Type<span class="mandatory">*</span></label>
+					<label class="margin-left-medium col-sm-3"">Asset Type<span class="mandatory">*</span></label>
 					<div class="col-sm-3">
 						<select class="form-control" id="deviceType" ng-model="deviceType" ng-options= "x for x in deviceTypeList">
 						</select>
@@ -46,24 +47,6 @@
 					<label class="margin-left-medium col-sm-3"">Software Version<span class="mandatory">*</span></label>
 					<div class="col-sm-3">
 						<select class="form-control" id="sofvercriteria" ng-model="$parent.sofvercriteria" ng-options="x for x in softVersionList">
-						</select>
-					</div>
-				</div>
-				</div>
-				<div ng-switch-when="memorySize">
-					<div class="form-group">
-					<label class="margin-left-medium col-sm-3"">Memory Size<span class="mandatory">*</span></label>
-					<div class="col-sm-3">
-						<select class="form-control" id="memsizecriteria" ng-model="$parent.memsizecriteria" ng-options="x for x in memorySizeList">
-						</select>
-					</div>
-				</div>
-				</div>
-				<div ng-switch-when="reachabilityStatus">
-					<div class="form-group">
-					<label class="margin-left-medium col-sm-3"">Reachability Status<span class="mandatory">*</span></label>
-					<div class="col-sm-3">
-						<select class="form-control" id="reachstatuscriteria" ng-model="$parent.reachstatuscriteria" ng-options="x for x in reachabilityStatus">
 						</select>
 					</div>
 				</div>

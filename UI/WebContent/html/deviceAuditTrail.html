@@ -2,17 +2,18 @@
 <head>
 <title>About</title>
 </head>
-<div ng-include="'sideNav.html'"></div>
+<div ng-include="'html/sideNav.html'"></div>
 <div class="container" style="margin-left:220px;">
+<div class = "col-sm-4"><h3>Asset Audit Trail</h3></div>
 </br>
 <div class ="col-sm-12 col-sm-offset-1" >
 			<div class="form-group">
-			<label class="col-sm-2">Select DNA Host<span class="mandatory">*</span></label>
+			<!-- <label class="col-sm-2">Select DNA Host<span class="mandatory">*</span></label>
 					<div class="col-sm-2">
 						<select class="form-control" id="hostId" ng-model="hostId" ng-options = "x for x in hostList" ng-change="onHostChange()">
 						</select>
-					</div>
-					<label class="col-sm-2">Select Device<span class="mandatory">*</span></label>
+					</div> -->
+					<label class="col-sm-2">Select Asset<span class="mandatory">*</span></label>
 					<div class="col-sm-2">
 						<select class="form-control" id="deviceId" ng-model="deviceId" ng-disabled="isDisabled">
 						 <option ng-repeat = "x in deviceList" value = "{{x.id}}">{{x.hostname}}</option>
@@ -29,14 +30,12 @@
   <table class="table table-condensed">
     <thead>
       <tr>
-        <th>DeviceName</th>
         <th>Description</th>
         <th>UpdatedOn</th>
       </tr>
     </thead>
     <tbody>
     <tr ng-repeat="x in auditSummary">
-    <td>{{ x.hostname }}</td>
     <td>Device Discovered in DNA-C on {{x.lastUpdated}}</td>
     <td>{{x.lastUpdated}}</td>
   </tr>

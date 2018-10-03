@@ -2,7 +2,7 @@ var app = angular.module('myApp')
 app.controller('DeviceAuditTrailController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies) {
 	$scope.username = $cookies.username;
 	$scope.deviceList = [];
-	$scope.hostList =[];
+	//$scope.hostList =[];
 	$scope.deviceId = '';
 	$scope.hostId ='';
 	$scope.auditSummary =[];
@@ -20,11 +20,9 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
 		        headers: {'Content-Type': 'application/json'}
 		    })
 		    .then(function(response) {
-				console.log(response);
-				for (var i=0;i<response.data.length;i++){
-					$scope.hostList.push(response.data[i]._id);
-				}
-				console.log($scope.hostList);
+		    	$scope.hostId = response.data[0]._id;
+				console.log($scope.hostId);
+				getDevices();
 		        }, 
 		        function(error) {
 		            // failed
@@ -32,8 +30,8 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
 					console.log("failed to get");
 		        });
 		 
-		 $scope.onHostChange = function(){
-			 console.log("host changed===  "+$scope.hostId);
+		 var getDevices = function(){
+			 console.log("get devices called  Host Id"+$scope.hostId);
 			 $http({
 				 url: 'https://localhost:8380/eam/v1/dna/'+$scope.hostId+'/devices',
 				 method: "GET",
@@ -85,7 +83,7 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
 		        });
 		  }
 		  else {
-			  alert("Either host id or  device name is not selected");
+			  alert("Asset name is not selected");
 			  return;
 		  }
 			  

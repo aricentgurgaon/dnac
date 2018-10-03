@@ -9,16 +9,12 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
 	$scope.userName = '';
 	$scope.templateName = '';
 	$scope.deviceTypeList = ['Cisco Catalyst 9300 Switch','Cisco ASR 1001-X Router','Cisco Catalyst38xx stack-able ethernet switch'];
-	$scope.criteriaList = ['softwareType','softwareVersion','memorySize', 'reachabilityStatus'];
+	$scope.criteriaList = ['softwareType','softwareVersion'];
 	$scope.criteria = $scope.criteriaList[0];
 	$scope.softTypeList = ['IOS-XE'];
 	$scope.softVersionList = ['16.6.1','16.6.2s'];
-	$scope.memorySizeList = ['8766878','3443553','3653664'];
-	$scope.reachabilityStatus = ['reachable','not reachable'];
 	$scope.softypecriteria = '';
 	$scope.sofvercriteria ='';
-	$scope.memsizecriteria ='';
-	$scope.reachstatuscriteria='';
 	$scope.criteriaValue = '';
 
 		
@@ -45,12 +41,8 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
 			console.log("inside softwareversion  "+$scope.sofvercriteria);
 			$scope.criteriaValue = $scope.sofvercriteria;
 		}
-		else if($scope.criteria == "memorySize"){ 
-			$scope.criteriaValue = $scope.memsizecriteria;
-		}
-		else if($scope.criteria == "reachabilityStatus"){ 
-			$scope.criteriaValue = $scope.reachstatuscriteria;
-		}else{
+		else{
+			alert("select a criteria");
 			console.log("inside else");
 		}
 		
@@ -62,10 +54,7 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
 				criteria : $scope.criteria,
 				criteriaValue : $scope.criteriaValue
 		}
-
 		console.log("id -- "+$scope.id);
-		console.log("data -- ");
-		console.log(tempData);
 		
 		$http({
 	       url :'https://localhost:8380/eam/v1/dna/template?templateId='+$scope.id,
@@ -97,8 +86,6 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
 		$scope.templateName = '';
 		$scope.softypecriteria = '';
 		$scope.sofvercriteria ='';
-		$scope.memsizecriteria ='';
-		$scope.reachstatuscriteria='';
 		$scope.criteriaValue = '';
 	}
 	console.log("inside template controller");

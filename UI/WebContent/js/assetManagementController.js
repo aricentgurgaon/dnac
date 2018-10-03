@@ -10,9 +10,14 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 	$scope.deviceName = '';
 	$scope.deviceType ='';
 	$scope.state ='';
+	$scope.info = '';
 	$scope.stateList = ['Purchase','Assign to engg.','Attach to DNA','Discovered'];
 	
 	$scope.search = function(){
+		if($scope.serialNo == '' || $scope.serialNo == undefined){
+			alert("Please Enter Asset Key to search");
+			return;
+		}
 		console.log("search called for "+$scope.serialNo);
 		 $http({
 			 url: 'https://localhost:8380/eam/v1/dna/asset?assetId='+$scope.serialNo,
@@ -25,20 +30,21 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 				$scope.deviceName = response.data.deviceName;
 				$scope.deviceType = response.data.deviceType;
 				$scope.state = response.data.state;
+				$scope.info =  response.data.info;
 		 }, 
 		 function(error) { // optional
 			 // failed
 			 console.log(error);
-			 console.log("failed to get device");
+			 console.log("failed to get the Asset");
 		 });
 	} 
 
 	$scope.save = function(){
-		console.log("criteria "+$scope.criteria);
 		var assetData = {
 				deviceType : $scope.deviceType,
 				deviceName : $scope.deviceName,
-				state : $scope.state
+				state : $scope.state,
+				info : $scope.info
 		}
 
 		console.log("data -- ");
@@ -74,6 +80,7 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 		$scope.deviceName = '';
 		$scope.deviceType ='';
 		$scope.state = '';
+		$scope.info = '';
 	}
 	console.log("inside Asset management controller");
 });
