@@ -200,7 +200,7 @@ class SimpleWalletClient(object):
                     #print("\n\n")
                     #print((base64.b64decode(x['payload'])).decode('UTF-8'))
                     payload = ((base64.b64decode(x['payload'])).decode('UTF-8')).split(",",1)
-                    #print(payload[1])
+
                     blocks+=str(payload[1])
                     blocks+=","
  
@@ -211,6 +211,31 @@ class SimpleWalletClient(object):
 
         except BaseException:
             return None
+
+
+
+
+#abhishek
+#    def getAssetFamily(self):
+#        result = self._send_to_restapi("transactions")
+#        try:
+#            blocks = "{ \"response\": ["
+#            for x in (yaml.safe_load(result)["data"]):
+#                payload = ((base64.b64decode(x['payload'])).decode('UTF-8')).split(",",1)
+#                tempData = jsonify(json.loads(payload[1]))
+#                if (tempData["softwareType"] == "IOS-XE"):
+#                    blocks+=str(payload[1])
+#                    blocks+=","
+#
+#
+#            blocks = blocks[:-1]
+#            blocks+="]}"
+#
+#            return blocks
+#
+#        except BaseException:
+#            return None
+
 
 
 
