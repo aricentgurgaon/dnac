@@ -6,13 +6,17 @@
     console.clear();
     console.log('running');
     if (!$cookies.username) {
-      $state.transitionTo('login');
+      $state.transitionTo('home');
     }
   });
 
   app.config(['$stateProvider', '$urlRouterProvider',
     function ($stateProvider, $urlRouterProvider) {
       $stateProvider
+        .state('home', {
+          url: '/home',
+          templateUrl: 'home.html'
+        })
         .state('login', {
           url: '/login',
           templateUrl: 'login.html',
@@ -53,7 +57,7 @@
           templateUrl: 'unfinished.html',
           controller: 'UnfinishedController',
         })
-      $urlRouterProvider.otherwise('/login');
+      $urlRouterProvider.otherwise('/home');
     }]);
 
 })();

@@ -17,6 +17,11 @@
     text-align: center;
 }
 
+.page-title{
+    color: cornflowerblue;
+    padding-bottom: 1em;
+}
+
 .container {
     justify-content: center;
     align-items: center;
