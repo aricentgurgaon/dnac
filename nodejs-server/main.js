@@ -35,10 +35,12 @@ app.use(cors({
 // };
 // app.use(allowCrosDomain);
 
-var token 					= undefined;
-var dnaConfig 				= undefined;
+var token			= undefined;
+var dnaConfig 			= undefined;
 var blockchainConfig 		= undefined;
 var complianceTemplate 		= undefined;
+const uname			= 'admin'
+const passwd			= 'passwd'
 const config_Collection		= 'config';
 const template_Collection 	= 'template';
 const assets_Collection 	= 'assets';
@@ -165,6 +167,29 @@ app.get('/eam/v1/dna/:dnaId/audit', function (req, res) {
 		getAuditTrail(assetId,res);
 	}
 });
+
+
+
+
+
+/**
+ *  * GET API to login 
+ *   */
+app.get('/eam/v1/dna/login', function (req, res) {
+  
+      var header=req.headers['authorization']||'',        // get the header
+      token=header.split(/\s+/).pop()||'',            // and the encoded auth token
+      auth=new Buffer.from(token, 'base64').toString(),    // convert from base64
+      parts=auth.split(/:/),                          // split on colon
+      username=parts[0],
+      password=parts[1];
+      if (uname == username && passwd == password) 
+      	sendResponse(res,200,{'status':'Login Successful'});
+      else
+        sendResponse(res,200,{'status':'Login Failed. Invalid username or password'});  
+});
+
+
 
 
 /**
