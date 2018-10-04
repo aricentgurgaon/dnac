@@ -7,13 +7,13 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
         $location.path('/login/');
     }
     $scope.user = $rootScope.userName;
-    $scope.userName = '';
-    $scope.host = '';
-    $scope.password = '';
+    $scope.dnaUsername = '';
+    $scope.dnahost = '';
+    $scope.dnapassword = '';
     $scope.buserName = '';
     $scope.bhost = '';
     $scope.bpassword = '';
-    $scope.id = '';
+    $scope.id = cfg.DNA_DEFAULT_ID;
     $scope.spark = '';
     $scope.sparkList = [{ 'sparkId': '123', 'sparkName': 'DNA_POC' }, { 'sparkId': '456', 'sparkName': 'common Room' }, { 'sparkId': '789', 'sparkName': 'Any_Name' }];
 
@@ -27,18 +27,37 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
         return text;
     }
 
+    $http({
+        url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/' + $scope.id + '/config',
+        method: "GET",
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(function(response){
+        $scope.dnahost = response.data.dna.host;
+        $scope.dnaUsername = response.data.dna.username;
+        $scope.bhost = response.data.blockChain.host;
+        $scope.spark = response.data.spark.sparkId;
+        $scope.dnapassword = '';
+    })
+    .catch(function(response){
+        $scope.dnahost = '';
+        $scope.dnaUsername = '';
+        $scope.bhost = '';
+        $scope.spark = '';
+    })
+
     $scope.save = function () {
-        $scope.id = generateId();
+        //$scope.id = generateId();
         var data = {
             dna: {
-                host: $scope.host,
-                username: $scope.userName,
-                password: $scope.password
+                host: $scope.dnahost,
+                username: $scope.dnaUsername,
+                password: $scope.dnapassword
             },
             blockChain: {
                 host: $scope.bhost,
-                username: $scope.buserName,
-                password: $scope.bpassword
+                //username: $scope.buserName,
+                //password: $scope.bpassword
             },
             spark: {
                 sparkId: $scope.spark
@@ -73,9 +92,9 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
 
     $scope.reset = function () {
         console.log("reset called");
-        $scope.userName = '';
-        $scope.host = '';
-        $scope.password = '';
+        $scope.dnaUsername = '';
+        $scope.dnahost = '';
+        $scope.dnapassword = '';
         $scope.buserName = '';
         $scope.bhost = '';
         $scope.bpassword = '';

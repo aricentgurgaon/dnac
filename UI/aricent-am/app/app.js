@@ -9,9 +9,10 @@
   });
 
   app.constant("cfg", {
-      // "API_SERVER_HOST": "173.39.230.185",
+      //"API_SERVER_HOST": "173.39.230.185",
       "API_SERVER_HOST": "localhost",
       "API_SERVER_PORT": "8380",
+      "DNA_DEFAULT_ID": "demo-id"
     }
   );
 

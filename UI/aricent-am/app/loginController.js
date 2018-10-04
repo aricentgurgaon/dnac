@@ -21,5 +21,8 @@ app.controller('LoginController', function ($scope, $rootScope, $stateParams, $s
                     $scope.error = "Incorrect username/password !";
                 }
             })
+            .catch(function (data) {
+                $scope.error = "Opps! Internal server error. Please try again.";
+            })
     }
 });
