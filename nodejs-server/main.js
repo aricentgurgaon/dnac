@@ -40,7 +40,7 @@ var dnaConfig 			= undefined;
 var blockchainConfig 		= undefined;
 var complianceTemplate 		= undefined;
 const uname			= 'admin'
-const passwd			= 'passwd'
+const passwd			= 'password'
 const config_Collection		= 'config';
 const template_Collection 	= 'template';
 const assets_Collection 	= 'assets';
@@ -186,7 +186,7 @@ app.get('/eam/v1/dna/login', function (req, res) {
       if (uname == username && passwd == password) 
       	sendResponse(res,200,{'status':'Login Successful'});
       else
-        sendResponse(res,200,{'status':'Login Failed. Invalid username or password'});  
+        sendResponse(res,401,{'status':'Login Failed. Invalid username or password'});  
 });
 
 
