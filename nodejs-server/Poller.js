@@ -7,7 +7,7 @@ class Poller extends EventEmitter {
     /**
      * @param {int} timeout how long should we wait after the poll started?
      */
-    constructor(timeout = 100) {
+    constructor(timeout = 10000) {
         super();
         this.timeout = timeout;
     }
