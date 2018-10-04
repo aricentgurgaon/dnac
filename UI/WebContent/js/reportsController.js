@@ -1,5 +1,5 @@
 var app = angular.module('myApp')
-app.controller('ReportsController', function($scope, $rootScope, $stateParams, $state, $http,$location,$cookies) {
+app.controller('ReportsController', function($scope, $rootScope, $stateParams, $state, $http,$location,$cookies, cfg) {
 	$scope.username = $cookies.username;
 	console.log("username---- "+ $scope.username);
 	  if(!$scope.username){
@@ -15,7 +15,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
 	$scope.nodesData = '';
 	
 	 $http({
-        url: 'https://localhost:8380/eam/v1/dna/template',
+        url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/template',
         method: "GET",
         headers: {'Content-Type': 'application/json'}
     })
@@ -35,7 +35,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
 	 
 	 //API to get all DNA host configured..
 	 $http({
-	        url: 'https://localhost:8380/eam/v1/dna/config',
+	        url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/config',
 	        method: "GET",
 	        headers: {'Content-Type': 'application/json'}
 	    })
@@ -58,7 +58,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
 		console.log("template   "+data);
 		console.log("dna host id ==  "+$scope.hostId);
 		 $http({
-			url: 'https://localhost:8380/eam/v1/dna/'+$scope.hostId+'/topology',
+			url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/topology',
 	        method: "GET",
 	        //data: data,
 	        //headers: {'Content-Type': 'application/json'}

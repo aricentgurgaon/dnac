@@ -9,7 +9,8 @@
   });
 
   app.constant("cfg", {
-      "API_SERVER_HOST": "localhost"
+      "API_SERVER_HOST": "localhost",
+      "API_SERVER_PORT": "8380",
     }
   );
 

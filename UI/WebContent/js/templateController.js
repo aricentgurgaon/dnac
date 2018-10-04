@@ -1,5 +1,5 @@
 var app = angular.module('myApp')
-app.controller('TemplateController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies) {
+app.controller('TemplateController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies, cfg) {
 	$scope.username = $cookies.username;
 	console.log("username---- "+ $scope.username);
 	  if(!$scope.username){
@@ -57,7 +57,7 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
 		console.log("id -- "+$scope.id);
 		
 		$http({
-	       url :'https://localhost:8380/eam/v1/dna/template?templateId='+$scope.id,
+	       url :'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/template?templateId='+$scope.id,
 	        method: "POST",
 	        data: tempData,
 	        headers: {'Content-Type': 'application/json'}

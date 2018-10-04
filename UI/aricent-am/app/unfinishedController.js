@@ -1,4 +1,4 @@
 
-app.controller('UnfinishedController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies) {
+app.controller('UnfinishedController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies, cfg) {
 
 });

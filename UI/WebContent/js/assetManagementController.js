@@ -1,5 +1,5 @@
 var app = angular.module('myApp')
-app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies) {
+app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies, cfg) {
 	$scope.username = $cookies.username;
 	console.log("username---- "+ $scope.username);
 	  if(!$scope.username){
@@ -20,7 +20,7 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 		}
 		console.log("search called for "+$scope.serialNo);
 		 $http({
-			 url: 'https://localhost:8380/eam/v1/dna/asset?assetId='+$scope.serialNo,
+			 url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/asset?assetId='+$scope.serialNo,
 			 method: "GET",
 			 headers: {'Content-Type': 'application/json'}
 		 })
@@ -51,7 +51,7 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 		console.log(assetData);
 		
 		$http({
-	       url :'https://localhost:8380/eam/v1/dna/asset?assetId='+$scope.serialNo,
+	       url :'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/asset?assetId='+$scope.serialNo,
 	        method: "POST",
 	        data: assetData,
 	        headers: {'Content-Type': 'application/json'}

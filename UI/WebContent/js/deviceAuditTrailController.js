@@ -1,5 +1,5 @@
 var app = angular.module('myApp')
-app.controller('DeviceAuditTrailController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies) {
+app.controller('DeviceAuditTrailController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies, cfg) {
 	$scope.username = $cookies.username;
 	$scope.deviceList = [];
 	//$scope.hostList =[];
@@ -15,7 +15,7 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
 	  
 	//API to get all DNA host configured..
 		 $http({
-		        url: 'https://localhost:8380/eam/v1/dna/config',
+		        url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/config',
 		        method: "GET",
 		        headers: {'Content-Type': 'application/json'}
 		    })
@@ -33,7 +33,7 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
 		 var getDevices = function(){
 			 console.log("get devices called  Host Id"+$scope.hostId);
 			 $http({
-				 url: 'https://localhost:8380/eam/v1/dna/'+$scope.hostId+'/devices',
+				 url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/devices',
 				 method: "GET",
 				 headers: {'Content-Type': 'application/json'}
 			 })
@@ -60,8 +60,8 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
 		  if($scope.hostId !='' && $scope.deviceId !='' && $scope.hostId != undefined && $scope.deviceId != undefined )
 		  {
 		  $http({
-		       //url :'https://localhost:8380/eam/v1/dna/'+$scope.hostId+'/device/'+$scope.deviceId,
-				url : 'https://localhost:8380/eam/v1/dna/'+$scope.hostId+'/audit?deviceId='+$scope.deviceId,
+		       //url :'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/device/'+$scope.deviceId,
+				url : 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/audit?deviceId='+$scope.deviceId,
 		        method: "GET",
 		        headers: {'Content-Type': 'application/json'}
 		    })

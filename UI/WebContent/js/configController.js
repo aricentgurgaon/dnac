@@ -1,6 +1,6 @@
 //configController.js
 var app = angular.module('myApp')
-app.controller('ConfigController', function($scope, $rootScope, $stateParams, $state, $http,$cookies, $location) {
+app.controller('ConfigController', function($scope, $rootScope, $stateParams, $state, $http,$cookies, $location, cfg) {
 	$scope.username = $cookies.username;
 	console.log("username---- "+ $scope.username);
 	  if(!$scope.username){
@@ -47,7 +47,7 @@ $scope.save = function(){
 			
 	console.log(data);
 	    $http({
-	    	url: 'https://localhost:8380/eam/v1/dna/'+$scope.id+'/config',
+	    	url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.id+'/config',
 	        method: "POST",
 	        data: data,
 	        headers: {'Content-Type': 'application/json'}
