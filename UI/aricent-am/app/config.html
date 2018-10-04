@@ -1,0 +1,67 @@
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Configuration</title>
+</head>
+<div class="container">
+    <div class="col-sm-12">
+        <form class="form">
+            <div class="form-group">
+                <label  style="font-size:16px"><b>DNA Host Configuration</b><span class="mandatory">*</span></label>
+            </div>
+
+            <div class="form-group">
+                <label >DNA Host <span class="mandatory">*</span></label>
+                <input type="text" class="form-control" id="host" ng-model="host" ng-change="change()"></input>
+            </div>
+
+            <div class="form-group">
+                <label >User Name <span class="mandatory">*</span></label>
+                <input type="text" class="form-control" id="userName" ng-model="userName"></input>
+            </div>
+
+            <div class="form-group">
+                <label >Password <span class="mandatory">*</span></label>
+                <input type="password" class="form-control" id="password" ng-model="password"></input>
+            </div>
+
+            <div class="form-group">
+                <label  style="font-size:16px"><b>DNA Block Chain Configuration</b><span class="mandatory">*</span></label>
+            </div>
+
+            <div class="form-group">
+                <label >BlockChain Host <span class="mandatory">*</span></label>
+                <input type="text" class="form-control" id="bhost" ng-model="bhost" ng-change="change()"></input>
+            </div>
+
+            <!-- <div class="form-group">
+                <label >User Name <span class="mandatory">*</span></label>
+                <input type="text" class="form-control" id="buserName" ng-model="buserName"></input>
+            </div>
+
+            <div class="form-group">
+                <label >Password <span class="mandatory">*</span></label>
+                <input type="password" class="form-control" id="bpassword" ng-model="bpassword"></input>
+            </div> -->
+
+            <div class="form-group">
+                <label style= "font-size:16px"><b>Notification Configuration </b><span class="mandatory">*</span></label>
+            </div>
+        
+            <div class="form-group">
+                <label>Select Spark <span class="mandatory">*</span></label>
+                <div >
+                    <select class="form-control" id="spark" ng-model="spark">
+                    <option ng-repeat = "x in sparkList" value = "{{x.sparkId}}">{{x.sparkName}}</option>
+                </select>
+                </div>
+            </div>
+
+            <div>
+                <div class="form-group">
+                    <button class="btn btn-primary" data-toggle="tooltip" title="Save Configuration" ng-click="save()">Save Config</button>
+                    <button class="btn btn-warning custom-form-btn-margin" data-toggle="tooltip" title="Reset Details" ng-click="reset()">Reset</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

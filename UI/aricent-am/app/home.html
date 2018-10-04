@@ -1,0 +1,25 @@
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Home</title>
+</head>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <h1>
+                Welcome to Aricent' DNA-C COMPLIANCE MANAGEMENT
+            </h1>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+           
+            <div ng-if="username">
+                <a ui-sref="logout">Logout</a>
+            </div>
+            <div ng-else="username">
+                <a ui-sref="login">Login</a>
+            </div>
+        </div>
+    </div>
+</div>
