@@ -7,16 +7,19 @@ app.controller('LoginController', function ($scope, $rootScope, $stateParams, $s
         $cookies.username = '';
     }
     $scope.formSubmit = function () {
-        if (LoginService.login($scope.username, $scope.password)) {
-            console.log("validated");
-            $rootScope.userName = $scope.username;
-            $cookies.username = $scope.username;
-            $scope.error = '';
-            $scope.username = '';
-            $scope.password = '';
-            $state.transitionTo('about');
-        } else {
-            $scope.error = "Incorrect username/password !";
-        }
+
+        LoginService.login($scope.username, $scope.password)
+            .then(function (isValidated) {
+                if (isValidated) {
+                    $rootScope.userName = $scope.username;
+                    $cookies.username = $scope.username;
+                    $scope.error = '';
+                    $scope.username = '';
+                    $scope.password = '';
+                    $state.transitionTo('home');
+                } else {
+                    $scope.error = "Incorrect username/password !";
+                }
+            })
     }
 });

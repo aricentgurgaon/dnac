@@ -1,6 +1,6 @@
 //app.js
 (function () {
-  var app = angular.module('myApp', ['ui.router', 'ngCookies']);
+  var app = angular.module('myApp', ['ui.router', 'ngCookies', 'base64']);
 
   app.run(function ($rootScope, $location, $state, $cookies) {
     if (!$cookies.username) {
@@ -9,6 +9,7 @@
   });
 
   app.constant("cfg", {
+      // "API_SERVER_HOST": "173.39.230.185",
       "API_SERVER_HOST": "localhost",
       "API_SERVER_PORT": "8380",
     }
