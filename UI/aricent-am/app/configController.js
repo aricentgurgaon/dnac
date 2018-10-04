@@ -1,6 +1,6 @@
 //configController.js
 app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $state, $http, $cookies, $location, cfg) {
-	console.log("Vikas: " + cfg.API_SERVER_HOST);
+
     $scope.username = $cookies.username;
     console.log("username---- " + $scope.username);
     if (!$scope.username) {

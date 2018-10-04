@@ -10,13 +10,12 @@
             </h1>
         </div>
     </div>
-
     <div class="row">
         <div class="col-sm-12">
-            <div ng-if="username">
+            <div ng-if="userName != ''">
                 <a ui-sref="logout">Logout</a>
             </div>
-            <div ng-else="username">
+            <div ng-if="userName == ''">
                 <a ui-sref="login">Login</a>
             </div>
         </div>

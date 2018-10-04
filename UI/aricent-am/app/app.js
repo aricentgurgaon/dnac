@@ -26,6 +26,11 @@
           templateUrl: 'login.html',
           controller: 'LoginController'
         })
+        .state('logout', {
+          url: '/logout',
+          templateUrl: 'login.html',
+          controller: 'LogoutController'
+        })
         .state('about', {
           url: '/about',
           templateUrl: 'about.html',
