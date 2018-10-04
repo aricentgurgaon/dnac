@@ -202,7 +202,15 @@ def update():
     res = {}
     res = {"status" : False, "msg" : "No Changes Found"}
 
-    deviceId = request.json["id"]
+
+
+    if ("serialNo" in request.json):
+        deviceId = request.json["serialNo"]
+    elif ("id" in request.json):
+        deviceId = request.json["id"]
+    else:
+        deviceId = request.json["_id"]
+
 
     keyfile = _get_keyfile(deviceId)
 

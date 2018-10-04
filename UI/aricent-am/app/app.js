@@ -2,13 +2,16 @@
 (function () {
   var app = angular.module('myApp', ['ui.router', 'ngCookies']);
 
-  app.run(function ($rootScope, $location, $state, $cookies, LoginService) {
-    console.clear();
-    console.log('running');
+  app.run(function ($rootScope, $location, $state, $cookies) {
     if (!$cookies.username) {
       $state.transitionTo('home');
     }
   });
+
+  app.constant("cfg", {
+      "API_SERVER_HOST": "localhost"
+    }
+  );
 
   app.config(['$stateProvider', '$urlRouterProvider',
     function ($stateProvider, $urlRouterProvider) {
@@ -58,5 +61,7 @@
         })
       $urlRouterProvider.otherwise('/home');
     }]);
+
+    
 
 })();

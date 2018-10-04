@@ -10,6 +10,7 @@ var httpUtility = require('./http_utility');
 var diff 		= require('./diff');
 var mongo 		= require('./mongo');
 var poller 		= require('./polling');
+var Utility 	= require('./utility');
 var app 		= express();
 
 app.use(bodyParser.json());
@@ -37,6 +38,7 @@ app.use(cors({
 var token 					= undefined;
 var dnaConfig 				= undefined;
 var blockchainConfig 		= undefined;
+var complianceTemplate 		= undefined;
 const config_Collection		= 'config';
 const template_Collection 	= 'template';
 const assets_Collection 	= 'assets';
@@ -45,14 +47,17 @@ const SPARK_ROOM_ID = 'Y2lzY29zcGFyazovL3VzL1JPT00vNmY5ODRjNTAtYmIwNi0xMWU4LTlmN
 /*********************************API Endpoints*************************************************/
     /*CRUD API for DNA Config's*/
 
+/**
+ * GET Api to start schedular
+ */	
 app.get('/eam/v1/dna/:dnaId/poll', function (req, res) {
 	var option	 = req.query.option;
-	var deviceId = req.query.id;
+	var assetId = req.query.id;
 	var dnaId 	 = req.params.dnaId;
 
 	if(dnaConfig === undefined || dnaId != dnaConfig['_id']){
 		console.log('Config not present, fetching from Mongo DB for dna Id : '+dnaId);
-		fetchConfig(dnaId,function(result,status){
+		fetchConfig(dnaId,config_Collection,function(result,status){
 
 			if(result != null && result != undefined){
 				if(status == true){
@@ -60,14 +65,7 @@ app.get('/eam/v1/dna/:dnaId/poll', function (req, res) {
 					blockchainConfig = result['blockchain'];
 					fetchToken(function (token,status,error){
 						if(status == true){
-							poller.startPolling(dnaConfig.host,option,deviceId,token,function(result,status,returnResponse){
-								if(returnResponse){
-									sendResponse(res,200,result);
-								}else{
-									console.log('Find difference');
-									publishToBlockChain(result.response);
-								}
-							});
+							triggerPolling(res,dnaConfig.host,option,assetId,token,true);
 						}
 					});
 				}else{
@@ -80,31 +78,82 @@ app.get('/eam/v1/dna/:dnaId/poll', function (req, res) {
 	}else{
 		fetchToken(function (token,status,error){
 			if(status == true){
-				poller.startPolling(dnaConfig.host,option,deviceId,token,function(result,status,returnResponse){
-					if(returnResponse){
-						sendResponse(res,200,result);
+				triggerPolling(res,dnaConfig.host,option,assetId,token,true);
+			}
+		});
+	}
+});
+
+/**
+ * GET Api to start complianace schedular
+ */	
+app.get('/eam/v1/dna/:dnaId/template/:template/compliance', function (req, res) {
+	var dnaId 	   = req.params.dnaId;
+	var templateId = req.params.template;
+	var polling    = req.query.polling;
+	var option	   = req.query.option;
+	var assetId	   = req.query.assetId;
+
+	if(dnaConfig === undefined || dnaId != dnaConfig['_id']){
+		console.log('Config not present, fetching from Mongo DB for dna Id : '+dnaId);
+
+		fetchConfig(templateId,template_Collection,function(result,status){
+			if(result != null && result != undefined){
+				complianceTemplate = result;
+				fetchConfig(dnaId,config_Collection,function(result,status){
+					if(result != null && result != undefined){
+						if(status == true){
+							dnaConfig = result['dna'];
+							blockchainConfig = result['blockchain'];
+							fetchToken(function (token,status,error){
+								console.log('Token Found -> compliance');
+								if(status == true){
+									console.log("Start polling");
+									triggerPolling(res,dnaConfig.host,option,assetId,token,polling);
+								}else{
+									sendResponse(res,500,{'status':error.errmsg});	
+								}
+							});
+						}else{
+							sendResponse(res,500,result);	
+						}
 					}else{
-						console.log('Find difference');		
-						publishToBlockChain(result.response);
-					}		
+						sendResponse(res,500,{'status':'No config found for dna id : '+dnaId});	
+					}
 				});
+			}else{
+				sendResponse(res,500,{'status':'No compliance template found for template id : '+dnaId});	
+			}
+		});
+	}else{
+		fetchConfig(dnaId,template_Collection,function(result,status){
+			if(result != null && result != undefined){
+				fetchToken(function (token,status,error){
+					if(status == true){
+						triggerPolling(res,dnaConfig.host,option,assetId,token);
+					}else{
+						sendResponse(res,500,result);	
+					}
+				});
+			}else{
+				sendResponse(res,500,{'status':'No compliance template found for template id : '+dnaId});	
 			}
 		});
 	}
 });
 
 app.get('/eam/v1/dna/:dnaId/audit', function (req, res) {
-	var deviceId = req.query.deviceId;
+	var assetId = req.query.assetId;
 	var dnaId    = req.params.dnaId;
 
 	if(dnaConfig === undefined || dnaId != dnaConfig['_id']){
 		console.log('Config not present, fetching from Mongo DB for dna Id : '+dnaId);
-		fetchConfig(dnaId,function(result,status){
+		fetchConfig(dnaId,config_Collection,function(result,status){
 			if(result != null && result != undefined){
 				if(status == true){
 					dnaConfig = result['dna'];
 					blockchainConfig = result['blockchain'];
-					getAuditTrail(deviceId,res);
+					getAuditTrail(assetId,res);
 				}else{
 					sendResponse(res,500,result);	
 				}
@@ -113,20 +162,27 @@ app.get('/eam/v1/dna/:dnaId/audit', function (req, res) {
 			}
 		});
 	}else{
-		getAuditTrail(deviceId,res);
+		getAuditTrail(assetId,res);
 	}
 });
 
+
+/**
+ * GET API to stop any polling going on with the help of specified eventId
+ */
 app.get('/eam/v1/dna/:dnaId/event/:eventid/stopPolling', function (req, res) {
-	var deviceId = req.params.eventid;
-	poller.stopPolling(deviceId,function(result,status){
+	var assetId = req.params.eventid;
+	poller.stopPolling(assetId,function(result,status){
 		sendResponse(res,200,result);	
 	});
 });
 
-/*CRUD API for DNA Config's*/
-app.all('/eam/v1/dna/asset', function (req, res) {
+/**
+ * CRUD Api's to perform management of assets in database
+ */
+app.all('/eam/v1/dna/:dnaId/asset', function (req, res) {
 	var assetId = req.query.assetId;
+	var dnaId   = req.params.dnaId;
 	switch (req.method) {
 	case 'GET':
 		if(assetId != undefined){
@@ -136,10 +192,10 @@ app.all('/eam/v1/dna/asset', function (req, res) {
 		}
         break;
     case 'POST':
-        setConfig(req,res,assetId,assets_Collection);
+		addAsset(req,res,assetId,assets_Collection,dnaId);
         break;
 	case 'PUT':
-		setConfig(req,res,assetId,assets_Collection);
+		addAsset(req,res,assetId,assets_Collection,dnaId);
         break;
 	case 'DELETE':
         deleteConfig(res,assetId,assets_Collection);
@@ -149,7 +205,9 @@ app.all('/eam/v1/dna/asset', function (req, res) {
 	} 
 });
 
-/*CRUD API for Complianace Templates*/
+/**
+ * API to perform CRUD operation for compliance templates
+ */
 app.all('/eam/v1/dna/template', function (req, res) {
 	var templateId = req.query.templateId;
 	switch (req.method) {
@@ -174,7 +232,9 @@ app.all('/eam/v1/dna/template', function (req, res) {
 	} 
 });
 
-/*CRUD API for DNA Config's*/
+/**
+ * API to perform CRUD operations on configs stored in database
+ */
 app.all('/eam/v1/dna/:dnaId/config', function (req, res) {
 	
 	var dnaId = req.params.dnaId;
@@ -196,32 +256,41 @@ app.all('/eam/v1/dna/:dnaId/config', function (req, res) {
 	} 
 });
 
-/*get all configs stored in DB*/
+/**
+ * API to get all DNA configs stored in database
+ */
 app.get('/eam/v1/dna/config',function (req, res){
 	getAllConfig(res,config_Collection);
 });
 
-/*Discover all interfaces in the DNA network*/
+/**
+ * API to get topology to specified DNA network
+ */
 app.get('/eam/v1/dna/:dnaId/topology', function (req, res) {
-
 	authorizeAndCallApi(res,req.params.dnaId, null,'TOPOLOGY');
 });
 
-/*Discover all interfaces in the DNA network*/
+/**
+ * API to get all interfaces availabe in DNA network
+ */
 app.get('/eam/v1/dna/:dnaId/interfaces', function (req, res) {
 	authorizeAndCallApi(res,req.params.dnaId, null,'INTERFACES');
 });
 
-/*Discover all devices in the DNA network*/
+/**
+ * API to get all assets/devices in DNA network
+ */
 app.get('/eam/v1/dna/:dnaId/devices', function (req, res) {
 	authorizeAndCallApi(res,req.params.dnaId, null,'DEVICES');
 });
 
-/*GET/UPDATE API to get and update device details*/
-app.all('/eam/v1/dna/:dnaId/device/:deviceId', function (req, res) {
+/**
+ * API to perform CRUF operation on any asset
+ */
+app.all('/eam/v1/dna/:dnaId/device/:assetId', function (req, res) {
 	
 	var dnaId	 = req.params.dnaId;
-	var deviceId = req.params.deviceId;
+	var assetId = req.params.assetId;
 	var endPoint = undefined;
 
 	switch (req.method) {
@@ -234,20 +303,113 @@ app.all('/eam/v1/dna/:dnaId/device/:deviceId', function (req, res) {
     default:
 		sendResponse(res,405,{'status': 'HTTP method not supported'});
 	}
-	authorizeAndCallApi(res,dnaId, deviceId,endPoint);
+	authorizeAndCallApi(res,dnaId, assetId,endPoint);
 });
 
-/*GET Delta for the device data saved*/
-app.get('/eam/v1/:dnaId/device/{deviceId}/config-delta', function (req, res) {
-	var dnaId 	 = req.params.dnaId;
-	var deviceId = req.params.deviceId;
-});
+/**
+ * 
+ * @param {*} res 
+ * @param {*} host 
+ * @param {*} option 
+ * @param {*} assetId 
+ * @param {*} token 
+ */
+var triggerPolling = function (res,host,option,assetId,token,polling){
 
-/************************Publish block to blockchain**************************************/
-var getAuditTrail = function (deviceId, res) {
+	if(polling != undefined && polling == true){
+		console.log("Trigerring polling for topology for every 10000 seconds");
+		poller.startPolling(host,option,assetId,token,function(result,status,returnResponse){
+			if(returnResponse){
+				sendResponse(res,200,result);
+			}else{
+				var arrNodes = [];
+				checkCompliance(result,function(assetblock,topologyNode,compliant){
+					arrNodes.push(topologyNode);
+					if(arrNodes.length == topology['nodes'].length){
+						topology['nodes'] = arrNodes;
+					}
+					if(compliant == false){
+						publishToBlockChain(assetblock);
+					}
+				});
+			}		
+		});
+	}else{
+		var api = '/api/v1/topology/physical-topology';
+		var headers = {
+			'Content-Type': 'application/json; charset=utf-8',
+			'x-auth-token': token
+		};
+		httpCall(dnaConfig.host, api,null,'GET',null,headers, function (result,status){;
+			if(status == true){
+				var arrNodes = [];
+				checkCompliance(result,function(assetblock,topologyNode,compliant){
+					arrNodes.push(topologyNode);
+					if(arrNodes.length == result['nodes'].length){
+						result['nodes'] = arrNodes;
+						sendResponse(res,200,result);
+					}
+					if(compliant == false){
+						publishToBlockChain(assetblock);
+					}
+				});
+			}else{
+				console.log('Error in fetching topology');
+				sendResponse(res,500,result);
+			}
+		});
+	}
+}
+
+/**
+ * 
+ * @param {*} topology 
+ */
+var checkCompliance = function(topology,callback){
+
+	var nodes = topology['nodes'];
+	nodes.forEach(function(node){
+		var id  = node['id'];
+		var api = '/api/v1/network-device/'+id;
+		var headers = {
+			'Content-Type': 'application/json; charset=utf-8',
+			'x-auth-token': token
+		};
+		httpCall(dnaConfig.host, api,null,'GET',null,headers, function (result,status){
+			var compliant = false;
+			if(status == true){
+				var criteriaValue  = complianceTemplate['criteriaValue'];
+				var valueToCompare = result[complianceTemplate['criteria']];
+				
+				console.log('criteria :' +complianceTemplate['criteria'] + 
+				' criteriaValue : '+criteriaValue+ ' valueToCompare :'+valueToCompare);
+
+				if(valueToCompare != undefined && valueToCompare < criteriaValue){
+					console.log('Device with id : '+id+ ' not compliant\n');
+					node['compliant'] = false;
+				}else{
+					node['compliant'] = true;
+					compliant = true;
+					console.log('Device with id : '+id+ ' is compliant\n');
+				}
+			}else{
+					
+				console.log('No asset found in DNA-C network with Id : : '+id);
+			}	
+			callback(result,node,compliant);
+		});
+	});
+}
+
+/**
+ * Function to get audit trail for the specified asset id
+ * @param {*} assetId 
+ * @param {*} res 
+ */
+var getAuditTrail = function (assetId, res) {
 
 	var host 	= blockchainConfig.host;
-	var api  	= '/traverse/'+deviceId;
+	var api  	= '/traverse/'+assetId;
 	var method 	= 'GET';
 	var port    = 5000;
     var headers = {
@@ -264,27 +426,36 @@ var getAuditTrail = function (deviceId, res) {
 	});
 }
 
+/**
+ * Function to publish block to blockchain network
+ * @param {*} block 
+ */
 var publishToBlockChain = function (block) {
 
-	console.log('Block to be posted : '+JSON.stringify(block.response));
+	console.log('Block to be posted : '+ JSON.stringify(block));
 	var host 	= blockchainConfig.host;
 	var api  	= '/update';
 	var method 	= 'POST';
+	var port 	= 5000;
     var headers = {
         'Content-Type': 'application/json; charset=utf-8'
     };
 	
-	httpCall(host, api,null,method,block,headers, function (result,status){;
+	httpCall(host, api, port, method, block ,headers, function (result,status){;
 		if(status == true){
-			sendSparkMessage(SPARK_ROOM_ID, JSON.stringify(result));
-			console.log('Publish to blockchain response : : '+JSON.stringify(response));
+			//sendSparkMessage(SPARK_ROOM_ID, JSON.stringify(result));
+			console.log('Publish to blockchain response : : '+JSON.stringify(result));
 		}else{
 			console.log('Publish to blockchain failed : : '+result);
 		}
 	});
 }
 
-/************************Send Spark message**************************************/
+/**
+ * Function to send message to specified spark room
+ * @param {*} roomId 
+ * @param {*} message 
+ */
 var sendSparkMessage = function (roomId, message) {
 	console.log('send message called');
     var host = 'api.ciscospark.com';
@@ -310,7 +481,16 @@ var sendSparkMessage = function (roomId, message) {
 	});
 };
 
-/**********************************************************************************/
+/**
+ * 
+ * @param {*} host 
+ * @param {*} api 
+ * @param {*} port 
+ * @param {*} method 
+ * @param {*} data 
+ * @param {*} headers 
+ * @param {*} callback 
+ */
 var httpCall = function (host,api,port,method,data,headers,callback){
 	
 	var error = function (data) {
@@ -319,7 +499,7 @@ var httpCall = function (host,api,port,method,data,headers,callback){
 
 	var success = function (data) {
 		try {
-			var response = JSON.parse(data.response);
+			var response = JSON.parse(data.response);			
 			if(response.response == undefined){
 				callback(response,true);
 			}else{
@@ -340,37 +520,12 @@ var httpCall = function (host,api,port,method,data,headers,callback){
 	);
 }
 
-var getQuery = function (host,api,callback){
-	var headers = {
-		'Content-Type': 'application/json; charset=utf-8',
-		'x-auth-token': token
-	};
-	
-	var error = function (data) {
-		callback({'status': 'Error in getting getQuery API response : '+data},false);
-	};
-
-	var success = function (data) {
-		try {
-			var response = JSON.parse(data.response);
-			callback(response.response,true);
-		} catch (e) {
-			console.log('\nError in getting getQuery API response : ' + e.errmsg);
-			callback({'status': e.errmsg},false);
-		}
-	}
-	makeHttpRequest(host,
-		null,
-		api,
-		headers,
-		'GET',
-		null,
-		success,
-		error
-	);
-}
-
-/**********************************************************************************/
+/**
+ * 
+ * @param {*} res 
+ * @param {*} dnaId 
+ * @param {*} collection 
+ */
 var deleteConfig = function (res,dnaId,collection){	
 	mongo.insertDocument(collection,jsonObj,function(result,success){
 		if(success == true){
@@ -381,12 +536,17 @@ var deleteConfig = function (res,dnaId,collection){
 	});
 }
 
+/**
+ * 
+ * @param {*} res 
+ * @param {*} collection 
+ */
 var getAllConfig = function (res,collection){
 	mongo.getAllDocuments(collection,function(result,success){	
 		if(success == true){
 			sendResponse(res,200,result);
 		}else{
-			if(IsJsonString(result)){
+			if(Utility.IsJsonString(result)){
 				sendResponse(res,500,result);	
 			}else{
 				sendResponse(res,500,{ 'status': result.errmsg});	
@@ -395,13 +555,19 @@ var getAllConfig = function (res,collection){
 	});
 }
 
+/**
+ * 
+ * @param {*} res 
+ * @param {*} id 
+ * @param {*} collection 
+ */
 var getConfig = function (res,id,collection){
 
 	mongo.getDocumentById(collection,id,function(result,success){	
 		if(success == true){
 			sendResponse(res,200,result);
 		}else{
-			if(IsJsonString(result)){
+			if(Utility.IsJsonString(result)){
 				sendResponse(res,500,result);	
 			}else{
 				sendResponse(res,500,{ 'status': result.errmsg});	
@@ -410,6 +576,13 @@ var getConfig = function (res,id,collection){
 	});
 }
 
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} id 
+ * @param {*} collection 
+ */
 var setConfig = function (req,res,id,collection){
 	if(req.body != undefined){
 		var jsonObj = req.body;
@@ -428,30 +601,61 @@ var setConfig = function (req,res,id,collection){
 	}
 }
 
-var updateConfig = function (req,res,id,collection){
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} id 
+ * @param {*} collection 
+ * @param {*} dnaId 
+ */
+var addAsset = function (req,res,id,collection,dnaId){
 	if(req.body != undefined){
 		var jsonObj = req.body;
+		var status  = false;
 		jsonObj['_id'] = id;
-		console.log('Update body : '+jsonObj);
-		
-		mongo.updateDocumentById(collection,id,jsonObj,function(result,success){
+		jsonObj['serialNumber'] = id;
+		mongo.upsertDocumentById(collection,id,jsonObj,function(result,success){
 			if(success == true){
 				sendResponse(res,200,result);
+
+				fetchConfig(dnaId,config_Collection,function(result,status){
+					if(result != null && result != undefined){
+						if(status == true){
+							console.log('Config found for id : '+dnaId);
+
+							dnaConfig = result['dna'];
+							blockchainConfig = result['blockchain'];
+							publishToBlockChain(jsonObj);
+						}else{
+							sendResponse(res,500,result);	
+							console.log(result);
+						}
+					}else{
+						console.log('No config found for dna id : '+dnaId);
+					}
+				});
 			}else{
-				sendResponse(res,500,{'status': result.errmsg});	
+				console.log({ 'status': result.errmsg});
 			}
 		});
 	}else{
-		sendResponse(res,400,{'status': 'Bad Request, request body no found'});	
+		sendResponse(res,400,{ 'status': 'Bad Request, request body no found'});	
 	}
 }
 
-/**********************************************************************************/
-function authorizeAndCallApi(res,dnaId, deviceId, api_Id){
+/**
+ * 
+ * @param {*} res 
+ * @param {*} dnaId 
+ * @param {*} assetId 
+ * @param {*} api_Id 
+ */
+function authorizeAndCallApi(res,dnaId, assetId, api_Id){
 	//If no cached config present then fetch config from MongoDB//
 	if(dnaConfig === undefined || dnaId != dnaConfig['_id']){
 		console.log('Config not present, fetching from Mongo DB for dna Id : '+dnaId);
-		fetchConfig(dnaId,function(result,status){
+		fetchConfig(dnaId,config_Collection,function(result,status){
 			if(result != null && result != undefined){
 				if(status == true){
 					console.log('Config found for id : '+dnaId);
@@ -460,7 +664,7 @@ function authorizeAndCallApi(res,dnaId, deviceId, api_Id){
 					blockchainConfig = result['blockchain'];
 					fetchToken(function (token,status,error){
 						if(status == true){
-							callAPI(dnaConfig.host, api_Id, dnaId, deviceId, res);
+							callAPI(dnaConfig.host, api_Id, dnaId, assetId, res);
 						}
 					});
 				}else{
@@ -474,15 +678,20 @@ function authorizeAndCallApi(res,dnaId, deviceId, api_Id){
 	}else{
 		fetchToken(function (token,status,error){
 			if(status == true){
-				callAPI(dnaConfig.host, api_Id, dnaId, deviceId, res);
+				callAPI(dnaConfig.host, api_Id, dnaId, assetId, res);
 			}
 		});
 	}
 }
 
-function fetchConfig(dnaId,callback){
+/**
+ * Fetch config data if not present
+ * @param {*} dnaId 
+ * @param {*} callback 
+ */
+function fetchConfig(dnaId,collectionName,callback){
 	console.log('\nFetching config for DNA ID : '+dnaId);
-	mongo.getDocumentById(config_Collection,dnaId,function(result,success){	
+	mongo.getDocumentById(collectionName,dnaId,function(result,success){	
 		if(success == true){
 			callback(result,true);
 		}else{
@@ -491,12 +700,16 @@ function fetchConfig(dnaId,callback){
 	});
 }
 
+/**
+ * Function to fetch DNA token if not present
+ * @param {*} callback 
+ */
 function fetchToken(callback){
         
 	//If token is cached then call api//
 	let host = dnaConfig.host;
 
-	if (hasValue(token) === true){
+	if (Utility.hasValue(token) === true){
 		console.log('\nToken Present');
 		callback(token,true,undefined);
 		return;
@@ -519,7 +732,7 @@ function fetchToken(callback){
 
     var success = function (data) {
         try {
-			if(hasValue(token) === false){
+			if(Utility.hasValue(token) === false){
 				var tokenJson = JSON.parse(data.response);
 				token = tokenJson.Token;
 				console.log('\nToken  Found');
@@ -533,7 +746,17 @@ function fetchToken(callback){
 	makeHttpRequest(host,null,endpoint,headers,method,null,success,error);
 }
 
-/********************************Helper Methods*****************************************/
+/**
+ * util function to make HTTP calls 
+ * @param {*} host 
+ * @param {*} port 
+ * @param {*} api 
+ * @param {*} headers 
+ * @param {*} method 
+ * @param {*} data 
+ * @param {*} successCallback 
+ * @param {*} errorCallback 
+ */
 function makeHttpRequest(host,port,api,headers,method,data,successCallback,errorCallback){
 	
 	console.log('\n*****************************API REQUEST*******************************');
@@ -555,13 +778,21 @@ function makeHttpRequest(host,port,api,headers,method,data,successCallback,error
 	httpUtility.performRequest(request);
 }
 
-function callAPI(host, api_id, dnaId, deviceId, res){
+/**
+ * utility function to call api's 
+ * @param {*} host 
+ * @param {*} api_id 
+ * @param {*} dnaId 
+ * @param {*} assetId 
+ * @param {*} res 
+ */
+function callAPI(host, api_id, dnaId, assetId, res){
 	
 	var api = undefined;
 
 	switch (api_id) {
     case 'DEVICE_BY_ID':
-		api = '/api/v1/network-device/'+deviceId;
+		api = '/api/v1/network-device/'+assetId;
 		break;
 		case 'TOPOLOGY':
 		api = '/api/v1/topology/physical-topology';
@@ -588,32 +819,13 @@ function callAPI(host, api_id, dnaId, deviceId, res){
 		}
 	});
 }
-function writeDataToFile(data,file){
-	var success = true;
-	fs.writeFile(file, data, 'utf8', function (err) {
-		if (err) {
-			success = false;
-		}
-	});
-	return success
-}
 
-
-function returnIfParamsNotPresent(res, id, id_name){
-	if (!id){
-		var response = {'status' : 'Bad request, requited param not present : ' + id_name};
-		sendResponse(res, 400, response);
-	}
-}
-
-function logJsonResponse(message, data){	
-	var beautifyOptions = {
-                    indent_size: 2,
-                    indent_char: " "
-                };
-    console.log(message +'\n'+ beautify(data, beautifyOptions));
-}
-
+/**
+ * Function to beautify and build http response with response code
+ * @param {*} res 
+ * @param {*} statusCode 
+ * @param {*} data 
+ */
 function sendResponse(res, statusCode, data){	
 	var beautifyOptions = {
                     indent_size: 2,
@@ -624,99 +836,6 @@ function sendResponse(res, statusCode, data){
 	res.status(statusCode).json(data);
 }
 
-function readJsonFile(fileName) {
-	
-	if (fs.existsSync(fileName)) {
-		let rawdata = fs.readFileSync(fileName);  
-		let dna_config = JSON.parse(rawdata);  
-		return dna_config;		
-    }
-	console.log("File not present with name : " + fileName);
-	return undefined;
-}
-
-function hasValue(data) {
-	if(data !== undefined){
-		return true
-	}
-	return false;
-}
-
-function IsJsonString(str) {
-    try {
-        JSON.parse(str);
-    } catch (e) {
-        return false;
-    }
-    return true;
-}
-
-/**********************************************************************************/
-function sendMessageIfDifference(data,file){
-	
-	var lhsString 	= readJsonFile(file);
-	var rhsString	= JSON.stringify(data);
-	
-				//console.log('is Array');
-
-	/*if(fileData != undefined && rhsString != undefined){
-		var lhsString 	= JSON.stringify(fileData);
-		var lhsJSON		= JSON.parse(lhsString);
-		var rhsJSON  	= JSON.parse(jsonContent);
-	
-		if(response instanceof Array){
-			console.log('is Array');
-		}else{
-			console.log('is JSON');
-		}
-	}*/
-}
-
-/**************************Starting https node server******************************/
-function testDiff(){
-	var diffs = [];
-	
-	var initialJson = {
-		'tag' : 125,
-		'tagName' : 'sad323',
-		'protocol' : 'HTTPS',
-		'version'  : '1.0'
-	};
-	console.log('Initial Json : ' + JSON.stringify(initialJson));
-
-	var j1 = {
-		'tag' : 125,
-		'tagName' : 'sad323',
-		'version' : '1.1'
-	};
-	var j2 = {
-		'tag' : 125,
-		'tagName' : 'sad323',
-		'protocol' : 'HTTPS',
-		'version' : '1.0'
-	};
-	var j3 = {
-		'tag' : 125,
-		'tagName' : 'sad323',
-		'protocol' : 'VOIP',
-		'version' : '1.2',
-		'iOX_version' : '1.7.0'
-	};
-	var array = [j1,j2,j3];
-	
-	array.forEach(function(json){
-		console.log('*******************************************');
-		var node = {};
-		var modified = false;
-		diff.recursiveDiff(initialJson,json,node,modified);
-		diffs.push(JSON.stringify(node));
-		console.log('All Diffs : ' + JSON.stringify(node) +'| Modified : ' + modified);
-		if(modified == true){
-			sendSparkMessage(SPARK_ROOM_ID,JSON.stringify(node));
-		}
-		console.log('*******************************************\n');
-	});	
-}
 
 var port = process.env.PORT || 8380;
 var server = https.createServer( options, app );

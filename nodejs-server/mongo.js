@@ -142,8 +142,12 @@ module.exports = {
 					callback(err,false);
 				}
 				else{
-					console.log("Update  Result : " + result);
-					callback({'status' : 'Document updated successfully'},true);
+					console.log("Result : " + result);
+					if(result.upserted != undefined){
+						callback({'status' : 'Document added successfully'},true);
+					}else{
+						callback({'status' : 'Document updated successfully'},true);
+					}
 				}
 				client.close();
 			});
