@@ -54,8 +54,7 @@
         })
         .state('unfinished', {
           url: '/unfinished',
-          templateUrl: 'unfinished.html',
-          controller: 'UnfinishedController',
+          templateUrl: 'unfinished.html'
         })
       $urlRouterProvider.otherwise('/home');
     }]);

@@ -1,7 +1,6 @@
 var app = angular.module('myApp')
 app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies) {
 	$scope.username = $cookies.username;
-	console.log("username---- "+ $scope.username);
 	  if(!$scope.username){
 		  $location.path('/login/');
 	  }
@@ -18,7 +17,6 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 			alert("Please Enter Asset Key to search");
 			return;
 		}
-		console.log("search called for "+$scope.serialNo);
 		 $http({
 			 url: 'https://localhost:8380/eam/v1/dna/asset?assetId='+$scope.serialNo,
 			 method: "GET",
@@ -26,30 +24,50 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 		 })
 		 .then(function(response) {
 			 console.log(response);
+			 console.log(response.data);
+			 console.log(response.data.length);
+			 if(response.data != '' && response.data != undefined){
 			 	$scope.serialNo = response.data._id;
 				$scope.deviceName = response.data.deviceName;
 				$scope.deviceType = response.data.deviceType;
 				$scope.state = response.data.state;
 				$scope.info =  response.data.info;
+			 }
+			 else{
+				 alert("No Asset found for Asset Key "+$scope.serialNo);
+			 }
 		 }, 
-		 function(error) { // optional
+		 function(error) {
 			 // failed
 			 console.log(error);
+			 alert("No Asset found for Asset Key "+$scope.serialNo);
 			 console.log("failed to get the Asset");
 		 });
 	} 
 
 	$scope.save = function(){
+		if($scope.serialNo == '' || $scope.serialNo == undefined){
+			alert("Please Enter Asset Key.");
+			return;
+		}
+		if($scope.deviceType == '' || $scope.deviceType == undefined){
+			alert("Please Enter Asset Type.");
+			return;
+		}
+		if($scope.deviceName == '' || $scope.deviceName == undefined){
+			alert("Please Enter Asset Name.");
+			return;
+		}
+		if($scope.state == '' || $scope.state == undefined){
+			alert("Please Enter State.");
+			return;
+		}
 		var assetData = {
 				deviceType : $scope.deviceType,
 				deviceName : $scope.deviceName,
 				state : $scope.state,
 				info : $scope.info
 		}
-
-		console.log("data -- ");
-		console.log(assetData);
-		
 		$http({
 	       url :'https://localhost:8380/eam/v1/dna/asset?assetId='+$scope.serialNo,
 	        method: "POST",
@@ -64,7 +82,7 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 			$scope.reset();
 			$state.transitionTo('assetmgmt');
 	        }, 
-	        function(response) { // optional
+	        function(response) {
 	            // failed
 	        	console.log(response);
 				console.log("failed to post");

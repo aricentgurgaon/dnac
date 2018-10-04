@@ -171,7 +171,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
 	              { width: 100, height: 100, fill: bluegrad, stroke: null }
 	            ),*/
 	  		 //$(go.Picture,'assets/images/Desktop48x48.png'),
-	            $(go.Picture,'assets/images/wireddeviceicon.png'),
+	            $(go.Picture,'images/wireddeviceicon.png'),
 	            $(go.TextBlock,
 	              //{ font: "10pt Verdana, sans-serif",textAlign :"center"},
 	            	{font: "bold 10pt Verdana, sans-serif",width: 150},
@@ -214,16 +214,16 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
 	  				  if(node.deviceType ==='cloud node'){
 	  				    cloudKey = node.id;
 	  				    node.isCloudNode = true;
-	  					node.image='assets/images/cloud.png';
+	  					node.image='images/cloud.png';
 	  				  }
 	  				else if(i==2||i==3){
 	  				   node.color='red';
 	  				  }
 	  				  
 	  				  if(node.deviceType.toLowerCase().indexOf("switch")!=-1){
-	  				    node.image='assets/images/switchicon.png';
+	  				    node.image='images/switchicon.png';
 	  				  }else if(node.deviceType.toLowerCase().indexOf("router")!=-1){
-	  				   node.image='assets/images/routericon.png';
+	  				   node.image='images/routericon.png';
 	  				  }
 	  				  if(node.family ==='WIRED'){
 	  				    node.category = 'WIRED';
