@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="ISO-8859-1">
+    <title>reports</title>
+</head>
+<div class="container">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="form-group">
+                <label>Select Template <span class="mandatory">*</span></label>
+                <div>
+                    <select class="form-control" id="template" ng-model="template">
+                        <option ng-repeat="x in templateList" value="{{x._id}}">{{x.templateName}}</option>
+                    </select>
+                </div>
+            </div>
+            <!-- <label>Select DNA Host <span class="mandatory">*</span></label>
+                <div>
+                    <select class="form-control" id="template" ng-model="hostId" ng-options="x for x in hostList">
+                    </select>
+                </div> -->
+            <div class="form-group">
+                <button class="btn btn-primary" data-toggle="tooltip" title="Run" ng-click="run()">Run</button>
+                <button class="btn btn-secondary custom-form-btn-margin" data-toggle="tooltip" title="Schedule" ng-click="Scheduler()">Scheduler</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <!-- <div  data-ng-init="init()"></div> -->
+            <div class="chart-bg" id="myDiagramDiv" style="border: solid 0px black; width:900px; height:650px">
+            </div>
+        </div>
+    </div>
+</div>

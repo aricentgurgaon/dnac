@@ -1,0 +1,117 @@
+<!doctype html>
+<html ng-app="myApp">
+
+<head>
+    <meta charset="utf-8">
+    <title>CISCO-DNA</title>
+    <script>document.write('<base href="' + document.location + '" />');</script>
+
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/font-awesome/web-fonts-with-css/css/fontawesome-all.min.css">
+
+
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.min.js"></script>
+    <script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="bower_components/html5-boilerplate/dist/js/vendor/jquery-1.12.0.min.js"></script>
+    <script src="bower_components/html5-boilerplate/dist/js/vendor/modernizr-2.8.3.min.js"></script>
+    <script src="bower_components/gojs/release/go.js"></script>
+
+    <!-- Project Files-->
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/sideNavigation.css">
+
+    <script src="app.js"></script>
+    <script src="loginController.js"></script>
+    <script src="configController.js"></script>
+    <script src="loginService.js"></script>
+    <script src="templateController.js"></script>
+    <script src="reportsController.js"></script>
+    <script src="aboutController.js"></script>
+    <script src="sideNav.js"></script>
+    <script src="assetManagementController.js"></script>
+    <script src="deviceAuditTrailController.js"></script>
+</head>
+
+<body style="background-color: #e8f6f8;">
+    <div class="topNav row">
+        <div class="col-lg-2 col-md-3 col-sm-3">
+            <img src="images/aricentlogo1.png" style="height: 90px;width: 225px;float:left;margin-left: 1em; border-radius: 8px;">
+        </div>
+
+        <div class="col-lg-8 col-md-6 col-sm-6">
+            <h3 class="app-title">
+                <span style="nowrap:true;">DNA-C COMPLIANCE MANAGEMENT</span>
+            </h3>
+        </div>
+        <div class="col-lg-2 col-md-3 col-sm-3">
+            <img src="images/dnaLogo.png" style="height: 90px;width: 225px;float:right;border-radius: 8px;">
+        </div>
+    </div>
+
+
+    <div class="sidenav">
+        <a ui-sref="about" class="active">About</a>
+        <a ui-sref="config">Configuration</a>
+        <a ui-sref="assetmgmt">Asset Management</a>
+        <button class="dropdown-btn">Compliance
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a ui-sref="template">Template</a>
+            <a ui-sref="reports">Reports</a>
+        </div>
+        <a ui-sref="unfinished">Resource Usage</a>
+        <button class="dropdown-btn">Audit Trail
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a ui-sref="devaudittrail">Devices</a>
+            <a ui-sref="unfinished">Interfaces</a>
+            <a ui-sref="unfinished">Topology</a>
+        </div>
+        <button class="dropdown-btn">User
+            <i class="fa fa-caret-down"></i>
+        </button>
+        <div class="dropdown-container">
+            <a ui-sref="unfinished">Profile</a>
+        </div>
+        <a ui-sref="login">Logout</a>
+    </div>
+    <div ui-view></div>
+
+    </div>
+
+    <div class="footer">
+        <p>© 2018 Copyright: </p>
+    </div>
+</body>
+<script>
+    function finishLoading() {
+        /* Loop through all dropdown buttons to toggle between hiding and showing its dropdown content - This allows the user to have multiple dropdowns without any conflict */
+        var dropdown = document.getElementsByClassName("dropdown-btn");
+        var i;
+        console.log("vikas - Dropdown length:" + dropdown.length);
+        for (i = 0; i < dropdown.length; i++) {
+            dropdown[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var dropdownContent = this.nextElementSibling;
+                if (dropdownContent.style.display === "block") {
+                    dropdownContent.style.display = "none";
+                } else {
+                    dropdownContent.style.display = "block";
+                }
+            });
+        }
+
+        $(".sidenav a").on("click", function () {
+            $(".sidenav").find(".active").removeClass("active");
+            $(this).addClass("active");
+        });
+    };
+    $(document).ready(finishLoading);
+</script>
+
+</html>
