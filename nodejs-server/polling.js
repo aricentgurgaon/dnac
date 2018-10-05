@@ -17,7 +17,7 @@ module.exports = {
             return;
         }
 
-        let poller = new Poller(10000,eventId); 
+        let poller = new Poller(20000,eventId); 
         // Wait till the timeout sent our event to the EventEmitter
         poller.onPoll(() => {
             console.log('\nPolling for event id : ' + eventId);
@@ -53,6 +53,9 @@ module.exports = {
             var successCallback = function (data) {
                 try {
                     var response = JSON.parse(data.response);
+                    if(response.response != undefined){
+                        response = response.response;
+                    }
                     callback(response,true,false);
                 } catch (e) {
                     console.log('\nError in successCallback : ' + e.errmsg);

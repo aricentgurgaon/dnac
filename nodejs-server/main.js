@@ -35,17 +35,18 @@ app.use(cors({
 // };
 // app.use(allowCrosDomain);
 
-var token			= undefined;
-var dnaConfig 			= undefined;
+var token 				    = undefined;
+var dnaConfig 				= undefined;
 var blockchainConfig 		= undefined;
 var complianceTemplate 		= undefined;
+var sparkDetails 			= undefined;
 const uname			= 'admin'
 const passwd			= 'password'
 const config_Collection		= 'config';
 const template_Collection 	= 'template';
 const assets_Collection 	= 'assets';
 
-const SPARK_ROOM_ID = 'Y2lzY29zcGFyazovL3VzL1JPT00vNmY5ODRjNTAtYmIwNi0xMWU4LTlmNzgtY2ZkNmJiM2UzZWQ5';
+const BOT_ACCESS_TOKEN = 'MGNhMjM5NDUtYzUxMy00YzE4LWE1M2EtMDhkN2U5ZDg4ZjYxYzdlNzFkOTUtNDE3'
 /*********************************API Endpoints*************************************************/
     /*CRUD API for DNA Config's*/
 
@@ -110,7 +111,6 @@ app.get('/eam/v1/dna/:dnaId/template/:template/compliance', function (req, res) 
 							fetchToken(function (token,status,error){
 								console.log('Token Found -> compliance');
 								if(status == true){
-									console.log("Start polling");
 									triggerPolling(res,dnaConfig.host,option,assetId,token,polling);
 								}else{
 									sendResponse(res,500,{'status':error.errmsg});	
@@ -167,10 +167,6 @@ app.get('/eam/v1/dna/:dnaId/audit', function (req, res) {
 		getAuditTrail(assetId,res);
 	}
 });
-
-
-
-
 
 /**
  *  * GET API to login 
@@ -341,7 +337,9 @@ app.all('/eam/v1/dna/:dnaId/device/:assetId', function (req, res) {
  */
 var triggerPolling = function (res,host,option,assetId,token,polling){
 
-	if(polling != undefined && polling == true){
+	console.log('Polling value : '+ polling);
+
+	if(polling != null && polling == 'true'){
 		console.log("Trigerring polling for topology for every 10000 seconds");
 		poller.startPolling(host,option,assetId,token,function(result,status,returnResponse){
 			if(returnResponse){
@@ -350,11 +348,17 @@ var triggerPolling = function (res,host,option,assetId,token,polling){
 				var arrNodes = [];
 				checkCompliance(result,function(assetblock,topologyNode,compliant){
 					arrNodes.push(topologyNode);
-					if(arrNodes.length == topology['nodes'].length){
-						topology['nodes'] = arrNodes;
+					if(arrNodes.length == result['nodes'].length){
+						result['nodes'] = arrNodes;
 					}
 					if(compliant == false){
-						publishToBlockChain(assetblock);
+						publishToBlockChain(assetblock,function(data,status){
+							console.log('data.status : ' + data.status);
+							if(data.status == true){
+								sendSparkMessage(sparkDetails.roomId,JSON.stringify(assetblock), function(result,status){
+								});
+							}
+						});
 					}
 				});
 			}		
@@ -375,7 +379,13 @@ var triggerPolling = function (res,host,option,assetId,token,polling){
 						sendResponse(res,200,result);
 					}
 					if(compliant == false){
-						publishToBlockChain(assetblock);
+						publishToBlockChain(assetblock,function(data,status){
+							console.log('data.status : ' + data.status);
+							if(data.status == true){
+								sendSparkMessage(sparkDetails.roomId,JSON.stringify(assetblock), function(result,status){
+								});
+							}
+						});
 					}
 				});
 			}else{
@@ -418,7 +428,6 @@ var checkCompliance = function(topology,callback){
 					console.log('Device with id : '+id+ ' is compliant\n');
 				}
 			}else{
-					
 				console.log('No asset found in DNA-C network with Id : : '+id);
 			}	
 			callback(result,node,compliant);
@@ -455,9 +464,8 @@ var getAuditTrail = function (assetId, res) {
  * Function to publish block to blockchain network
  * @param {*} block 
  */
-var publishToBlockChain = function (block) {
-
-	console.log('Block to be posted : '+ JSON.stringify(block));
+var publishToBlockChain = function (block, callback) {
+	
 	var host 	= blockchainConfig.host;
 	var api  	= '/update';
 	var method 	= 'POST';
@@ -465,28 +473,38 @@ var publishToBlockChain = function (block) {
     var headers = {
         'Content-Type': 'application/json; charset=utf-8'
     };
-	
+
 	httpCall(host, api, port, method, block ,headers, function (result,status){;
 		if(status == true){
-			//sendSparkMessage(SPARK_ROOM_ID, JSON.stringify(result));
 			console.log('Publish to blockchain response : : '+JSON.stringify(result));
+			callback(result,true);
 		}else{
 			console.log('Publish to blockchain failed : : '+result);
+			callback(result,false);
 		}
 	});
 }
 
+var buildMessage = function (block){
+
+	var newBlock 		 = {};
+	newBlock['hostName'] = block.hostName;
+	newBlock['type'] 	 = block.type;
+	newBlock['serialNumber'] = block.serialNumber;
+	return newBlock;
+}
 /**
  * Function to send message to specified spark room
  * @param {*} roomId 
  * @param {*} message 
  */
-var sendSparkMessage = function (roomId, message) {
-	console.log('send message called');
+var sendSparkMessage = function (roomId, message,callback) {
+	console.log('Send message to spark room called');
     var host = 'api.ciscospark.com';
-    var endpoint = '/v1/messages';
-
-	console.log('message to be send in spark room :' +message);
+	var api  = '/v1/messages';
+	
+	//var data = buildMessage(message);
+	console.log('message to be send in spark room :' + message);
     var data = {
         roomId: roomId,
         text: message
@@ -495,13 +513,17 @@ var sendSparkMessage = function (roomId, message) {
     var method = 'POST';
     var headers = {
         'Content-Type': 'application/json; charset=utf-8',
-        'Authorization': 'Bearer ' + 'YWUzN2IxODMtYjE2Zi00NWZlLTg5YTctNWY2OTZiZmY3YTA2MWZkMzkyZjctZDcy'
+        'Authorization': 'Bearer ' + BOT_ACCESS_TOKEN
     };
 	httpCall(host, api,null,'POST',data,headers, function (result,status){;
+		console.log('message send response : '+ result);
 		if(status == true){
-			sendResponse(res,200,result);
+			//sendResponse(res,200,result);
+			
+			callback({'status' : 'Message posted to spark room successfully'},true);
 		}else{
-			sendResponse(res,500,result);
+			callback(result,false);
+			//sendResponse(res,500,result);
 		}
 	});
 };
@@ -651,7 +673,9 @@ var addAsset = function (req,res,id,collection,dnaId){
 
 							dnaConfig = result['dna'];
 							blockchainConfig = result['blockchain'];
-							publishToBlockChain(jsonObj);
+							publishToBlockChain(jsonObj,function(data,status){
+
+							});
 						}else{
 							sendResponse(res,500,result);	
 							console.log(result);
