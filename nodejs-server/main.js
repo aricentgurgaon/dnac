@@ -358,7 +358,7 @@ var triggerPolling = function (res,host,option,assetId,token,polling){
 						publishToBlockChain(assetblock,function(data,status){
 							console.log('data.status : ' + data.status);
 							if(data.status == true){
-								sendSparkMessage(sparkDetails.roomId,JSON.stringify(assetblock), function(result,status){
+								sendSparkMessage(sparkDetails.roomId,assetblock.state, function(result,status){
 								});
 							}
 						});
@@ -388,7 +388,7 @@ var triggerPolling = function (res,host,option,assetId,token,polling){
 							console.log('assetblock.state : ' + assetblock['state']);
 							if(data.status == true){
 								sendSparkMessage(sparkDetails.roomId,assetblock.state, function(result,status){
-								});
+							});
 							}
 						});
 					}
@@ -410,9 +410,7 @@ var checkCompliance = function(topology,callback){
 	var nodes = topology['nodes'];
 
 	nodes.forEach(function(node){
-		
-		if(complianceTemplate['deviceType'] == node.deviceType){
-			var id  = node['id'];
+		var id  = node['id'];
 			var api = '/api/v1/network-device/'+id;
 			var headers = {
 				'Content-Type': 'application/json; charset=utf-8',
@@ -442,9 +440,12 @@ var checkCompliance = function(topology,callback){
 				}	
 				callback(result,node,compliant);
 			});
-		}else{
-			console.log('No check requited for device');
-		}
+		// if(complianceTemplate['deviceType'] == node.deviceType){
+			
+		// }else{
+		// 	console.log('No check requited for device');
+		// 	callback(result,node,compliant);
+		// }
 	});
 }
 
@@ -512,14 +513,9 @@ var buildMessage = function (block){
  * @param {*} message 
  */
 var sendSparkMessage = function (roomId, message,callback) {
-	console.log('Send message to spark room called');
     var host = 'api.ciscospark.com';
 	var api  = '/v1/messages';
 	
-	//var data = buildMessage(message);
-	console.log('message to be send in spark room :' + message);
-	console.log('roomId :' + roomId);
-
     var data = {
         roomId: roomId,
         text: message
@@ -531,14 +527,10 @@ var sendSparkMessage = function (roomId, message,callback) {
         'Authorization': 'Bearer ' + BOT_ACCESS_TOKEN
     };
 	httpCall(host, api,null,'POST',data,headers, function (result,status){;
-		console.log('message send response : '+ result);
 		if(status == true){
-			//sendResponse(res,200,result);
-			
 			callback({'status' : 'Message posted to spark room successfully'},true);
 		}else{
 			callback(result,false);
-			//sendResponse(res,500,result);
 		}
 	});
 };
