@@ -5,7 +5,7 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
     //$scope.hostList =[];
     $scope.serialNumber	 = '';
     $scope.hostId ='';
-    $scope.auditSummary = '';
+    $scope.auditSummary = [];
     $scope.isDisabled = true;
     $scope.description = '';
       if(!$scope.username){
