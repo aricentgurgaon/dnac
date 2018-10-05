@@ -10,7 +10,7 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
     $scope.dnaUsername = '';
     $scope.dnahost = '';
     $scope.dnapassword = '';
-    $scope.buserName = '';
+    //$scope.buserName = '';
     $scope.bhost = '';
     $scope.bpassword = '';
     $scope.id = cfg.DNA_DEFAULT_ID;
@@ -57,6 +57,26 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
 
     $scope.save = function () {
         //$scope.id = generateId();
+    	if($scope.dnahost == '' || $scope.dnahost == undefined){
+    		alert("Please enter DNA Host");
+    		return;
+    	}
+    	else if($scope.dnaUsername == '' || $scope.dnaUsername == undefined){
+    		alert("Please enter User Name for DNA Host");
+    		return;
+    	}
+    	else if($scope.dnapassword == '' || $scope.dnapassword == undefined){
+    		alert("Please enter Password for DNA Host");
+    		return;
+    	}
+    	else if($scope.bhost == '' || $scope.bhost == undefined){
+    		alert("Please enter Block Chain Host");
+    		return;
+    	}
+    	else if($scope.spark == '' || $scope.spark == undefined){
+    		alert("Please Select Spark room to get Message");
+    		return;
+    	}
         var data = {
             dna: {
                 host: $scope.dnahost,
@@ -65,8 +85,6 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
             },
             blockchain: {
                 host: $scope.bhost,
-                //username: $scope.buserName,
-                //password: $scope.bpassword
             },
             spark: {
             	roomId: $scope.spark

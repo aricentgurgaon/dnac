@@ -50,9 +50,14 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
             });
     
     $scope.run = function(){
-        var data = $scope.template;
-        console.log("template   "+data);
-        console.log("dna host id ==  "+$scope.hostId);
+        if($scope.template =='' || $scope.template == undefined){
+        	alert("Please select Template");
+        	return;
+        }
+        if($scope.hostId == '' || $scope.hostId == undefined){
+        	alert("No DNA Host found")
+        	return;
+        }
          $http({
             url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/template/'+$scope.template+'/compliance?option=TOPOLOGY&polling=false',
             method: "GET",
@@ -69,7 +74,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
             function(error) {
                 // failed
                 console.log(error);
-                console.log("failed to post");
+                console.log("failed to Get Topology");
             }
         );
     }
