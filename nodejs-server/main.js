@@ -66,6 +66,7 @@ app.get('/eam/v1/dna/:dnaId/poll', function (req, res) {
 				if(status == true){
 					dnaConfig = result['dna'];
 					blockchainConfig = result['blockchain'];
+					sparkDetails	 = result['spark'];
 					fetchToken(function (token,status,error){
 						if(status == true){
 							triggerPolling(res,dnaConfig.host,option,assetId,token,true);
@@ -108,6 +109,7 @@ app.get('/eam/v1/dna/:dnaId/template/:template/compliance', function (req, res) 
 						if(status == true){
 							dnaConfig = result['dna'];
 							blockchainConfig = result['blockchain'];
+							sparkDetails	 = result['spark'];
 							fetchToken(function (token,status,error){
 								console.log('Token Found -> compliance');
 								if(status == true){
@@ -155,6 +157,7 @@ app.get('/eam/v1/dna/:dnaId/audit', function (req, res) {
 				if(status == true){
 					dnaConfig = result['dna'];
 					blockchainConfig = result['blockchain'];
+					sparkDetails	 = result['spark'];
 					getAuditTrail(assetId,res);
 				}else{
 					sendResponse(res,500,result);	
@@ -378,11 +381,13 @@ var triggerPolling = function (res,host,option,assetId,token,polling){
 						result['nodes'] = arrNodes;
 						sendResponse(res,200,result);
 					}
+
 					if(compliant == false){
 						publishToBlockChain(assetblock,function(data,status){
 							console.log('data.status : ' + data.status);
+							console.log('assetblock.state : ' + assetblock['state']);
 							if(data.status == true){
-								sendSparkMessage(sparkDetails.roomId,JSON.stringify(assetblock), function(result,status){
+								sendSparkMessage(sparkDetails.roomId,assetblock.state, function(result,status){
 								});
 							}
 						});
@@ -403,35 +408,43 @@ var triggerPolling = function (res,host,option,assetId,token,polling){
 var checkCompliance = function(topology,callback){
 
 	var nodes = topology['nodes'];
-	nodes.forEach(function(node){
-		var id  = node['id'];
-		var api = '/api/v1/network-device/'+id;
-		var headers = {
-			'Content-Type': 'application/json; charset=utf-8',
-			'x-auth-token': token
-		};
-		httpCall(dnaConfig.host, api,null,'GET',null,headers, function (result,status){
-			var compliant = false;
-			if(status == true){
-				var criteriaValue  = complianceTemplate['criteriaValue'];
-				var valueToCompare = result[complianceTemplate['criteria']];
-				
-				console.log('criteria :' +complianceTemplate['criteria'] + 
-				' criteriaValue : '+criteriaValue+ ' valueToCompare :'+valueToCompare);
 
-				if(valueToCompare != undefined && valueToCompare < criteriaValue){
-					console.log('Device with id : '+id+ ' not compliant\n');
-					node['compliant'] = false;
+	nodes.forEach(function(node){
+		
+		if(complianceTemplate['deviceType'] == node.deviceType){
+			var id  = node['id'];
+			var api = '/api/v1/network-device/'+id;
+			var headers = {
+				'Content-Type': 'application/json; charset=utf-8',
+				'x-auth-token': token
+			};
+			httpCall(dnaConfig.host, api,null,'GET',null,headers, function (result,status){
+				var compliant = undefined;
+				if(status == true){
+
+					var criteriaValue  = complianceTemplate['criteriaValue'];
+					var valueToCompare = result[complianceTemplate['criteria']];
+				
+					console.log('criteria :' +complianceTemplate['criteria'] + 
+					' criteriaValue : '+criteriaValue+ ' valueToCompare :'+valueToCompare);
+
+					if(valueToCompare != undefined && valueToCompare < criteriaValue){
+						console.log('Device with id : '+id+ ' not compliant\n');
+						node['compliant'] = false;
+						var state = 'Compliance failed for asset with id : ' +  id +'. '+ complianceTemplate['criteria'] +
+						' is not '+ criteriaValue;
+						result['state'] = state;
+						node['state'] = state;
+						compliant = false;
+					}
 				}else{
-					node['compliant'] = true;
-					compliant = true;
-					console.log('Device with id : '+id+ ' is compliant\n');
-				}
-			}else{
-				console.log('No asset found in DNA-C network with Id : : '+id);
-			}	
-			callback(result,node,compliant);
-		});
+					console.log('No asset found in DNA-C network with Id : : '+id);
+				}	
+				callback(result,node,compliant);
+			});
+		}else{
+			console.log('No check requited for device');
+		}
 	});
 }
 
@@ -505,6 +518,8 @@ var sendSparkMessage = function (roomId, message,callback) {
 	
 	//var data = buildMessage(message);
 	console.log('message to be send in spark room :' + message);
+	console.log('roomId :' + roomId);
+
     var data = {
         roomId: roomId,
         text: message
@@ -673,6 +688,7 @@ var addAsset = function (req,res,id,collection,dnaId){
 
 							dnaConfig = result['dna'];
 							blockchainConfig = result['blockchain'];
+							sparkDetails	 = result['spark'];
 							publishToBlockChain(jsonObj,function(data,status){
 
 							});
@@ -711,6 +727,7 @@ function authorizeAndCallApi(res,dnaId, assetId, api_Id){
 					
 					dnaConfig = result['dna'];
 					blockchainConfig = result['blockchain'];
+					sparkDetails	 = result['spark'];
 					fetchToken(function (token,status,error){
 						if(status == true){
 							callAPI(dnaConfig.host, api_Id, dnaId, assetId, res);
