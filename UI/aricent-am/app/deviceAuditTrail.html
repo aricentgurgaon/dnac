@@ -10,8 +10,8 @@
 			<div class="form-group">
 				<label>Select Asset <span class="mandatory">*</span></label>
 				<div class="row">
-					<select class="form-control" id="deviceId" ng-model="deviceId" ng-disabled="isDisabled">
-						<option ng-repeat="x in deviceList" value="{{x.id}}">{{x.hostname}}</option>
+					<select class="form-control" id="serialNumber" ng-model="serialNumber" ng-disabled="isDisabled">
+						<option ng-repeat="x in deviceList" value="{{x.serialNumber}}">{{x.serialNumber}} - ({{x.hostname}})</option>
 					</select>
 					<button class="btn btn-primary custom-form-btn-margin" data-toggle="tooltip" title="Run" ng-click="run()">Audit</button>
 				</div>
@@ -25,16 +25,14 @@
 		<table class="table table-condensed">
 			<thead>
 				<tr>
-					<th>DeviceName</th>
 					<th>Description</th>
 					<th>UpdatedOn</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="x in auditSummary">
-					<td>{{ x.hostname }}</td>
-					<td>Device Discovered in DNA-C on {{x.lastUpdated}}</td>
-					<td>{{x.lastUpdated}}</td>
+					<td>{{x.description}}</td>
+					<td>{{x.updatedOn}}</td>
 				</tr>
 			</tbody>
 		</table>

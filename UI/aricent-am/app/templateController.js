@@ -12,12 +12,11 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
     $scope.criteriaList = ['softwareType','softwareVersion'];
     $scope.criteria = $scope.criteriaList[0];
     $scope.softTypeList = ['IOS-XE'];
-    $scope.softVersionList = ['16.6.1','16.6.2s'];
+    $scope.softVersionList = ['16.6.1','16.6.2s','16.6.4'];
     $scope.softypecriteria = '';
     $scope.sofvercriteria ='';
     $scope.criteriaValue = '';
 
-        
     var generateId = function () {
         var text = "";
         var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -28,58 +27,73 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
         return text;
     }
 
+	$scope.save = function(){
+		$scope.id = generateId();
+		
+		console.log("criteria "+$scope.criteria);
+		if($scope.templateName == '' || $scope.templateName == undefined){
+			alert("Please Enter template Name");
+			return;
+		}
+		if($scope.deviceType == '' || $scope.deviceType == undefined){
+			alert("Please Enter Asset Type");
+			return;
+		}
+		if($scope.criteria == '' || $scope.criteria == undefined){
+			alert("Please Select Criteria");
+			return;
+		}
+		
+		if($scope.criteria == "softwareType") {
+			console.log("inside softwareType  "+$scope.softypecriteria);
+			$scope.criteriaValue = $scope.softypecriteria;
+		}
+		else if($scope.criteria == "softwareVersion"){ 
+			console.log("inside softwareversion  "+$scope.sofvercriteria);
+			$scope.criteriaValue = $scope.sofvercriteria;
+		}
+		else{
+			alert("select a criteria");
+		}
+		
+		if($scope.criteriaValue == '' || $scope.criteriaValue == undefined){
+			alert("Please Select Criteria Value");
+			return;
+		}
+		
+		console.log("criteria value "+$scope.criteriaValue);
 
-    $scope.save = function(){
-        $scope.id = generateId();
-        console.log("criteria "+$scope.criteria);
-        
-        if($scope.criteria == "softwareType") {
-            console.log("inside softwareType  "+$scope.softypecriteria);
-            $scope.criteriaValue = $scope.softypecriteria;
-        }
-        else if($scope.criteria == "softwareVersion"){ 
-            console.log("inside softwareversion  "+$scope.sofvercriteria);
-            $scope.criteriaValue = $scope.sofvercriteria;
-        }
-        else{
-            alert("select a criteria");
-            console.log("inside else");
-        }
-        
-        console.log("criteria value "+$scope.criteriaValue);
-
-        var tempData = {
-                templateName : $scope.templateName,
-                deviceType : $scope.deviceType,
-                criteria : $scope.criteria,
-                criteriaValue : $scope.criteriaValue
-        }
-        console.log("id -- "+$scope.id);
-        
-        $http({
-           url :'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/template?templateId='+$scope.id,
-            method: "POST",
-            data: tempData,
-            headers: {'Content-Type': 'application/json'}
-        })
-        .then(function(response) {
-                // success
-            console.log("success");
-            console.log(response);
-            alert("Template Saved successfully.");
-            $scope.reset();
-            $state.transitionTo('template');
-            }, 
-            function(response) { // optional
-                // failed
-                console.log(response);
-                console.log("failed to post");
-                alert("Error While saving Template.");
-                $scope.reset();
-                $state.transitionTo('template');
-            }
-        );
-    }
+		var tempData = {
+				name : $scope.templateName,
+				deviceType : $scope.deviceType,
+				criteria : $scope.criteria,
+				criteriaValue : $scope.criteriaValue
+		}
+		
+		$http({
+	       url :'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/template?templateId='+$scope.id,
+	        method: "POST",
+	        data: tempData,
+	        headers: {'Content-Type': 'application/json'}
+	    })
+	    .then(function(response) {
+	            // success
+	    	console.log("success");
+			console.log(response);
+			alert("Template Saved successfully.");
+			$scope.reset();
+			$state.transitionTo('template');
+	        }, 
+	        function(response) {
+	            // failed
+	        	console.log(response);
+				console.log("failed to post");
+				alert("Error While saving Template.");
+				$scope.reset();
+				$state.transitionTo('template');
+	        }
+	    );
+	}
 
     $scope.reset = function(){
         $scope.deviceType ='';

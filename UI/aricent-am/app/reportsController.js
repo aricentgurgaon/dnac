@@ -22,12 +22,12 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
     .then(function(response) {
         console.log(response);
         for (var i=0;i<response.data.length;i++){
-            if(response.data[i].templateName)
+            if(response.data[i].name)
                 $scope.templateList.push(response.data[i]);
         }
         console.log($scope.templateList);
         }, 
-        function(response) { // optional
+        function(response) {
             // failed
             console.log(response);
             console.log("failed to post");
@@ -40,10 +40,6 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
             headers: {'Content-Type': 'application/json'}
         })
         .then(function(response) {
-            console.log(response);
-            /*for (var i=0;i<response.data.length;i++){
-                $scope.hostList.push(response.data[i]._id);
-            }*/
             $scope.hostId = response.data[0]._id;
             console.log($scope.hostId);
             }, 
@@ -58,10 +54,8 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
         console.log("template   "+data);
         console.log("dna host id ==  "+$scope.hostId);
          $http({
-            url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/topology',
+            url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/template/'+$scope.template+'/compliance?option=TOPOLOGY&polling=false',
             method: "GET",
-            //data: data,
-            //headers: {'Content-Type': 'application/json'}
             headers: {'Authorization':'Basic ZGV2bmV0dXNlcjpDaXNjbzEyMyE=','Content-Type': 'application/json','Access-Control-Allow-Origin':'*'}
         })
         .then(function(response) {
@@ -72,7 +66,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
             $('#myDiagramDiv').show();
             $scope.init();
             }, 
-            function(error) { // optional
+            function(error) {
                 // failed
                 console.log(error);
                 console.log("failed to post");
@@ -216,8 +210,11 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
                           node.isCloudNode = true;
                           node.image='images/cloud.png';
                         }
-                      else if(i==2||i==3){
+                     /* else if(i==2||i==3){
                          node.color='red';
+                        }*/
+                        if(node.compliant == false){
+                        	node.color='red';
                         }
                         
                         if(node.deviceType.toLowerCase().indexOf("switch")!=-1){
@@ -247,11 +244,9 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
                        $scope.markThisTargetAsSource(linkDataList,parentLink);             
                      }
                   }
-                  //console.log('linkDataList:-'+JSON.stringify(linkDataList));
               $scope.myDiagram.model =
               $(go.GraphLinksModel,
                 { nodeDataArray: nodeDataList,
                   linkDataArray: linkDataList });
-              // console.log('myDiagram.div = '+myDiagram.div);
     }
 });

@@ -15,7 +15,16 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
     $scope.bpassword = '';
     $scope.id = cfg.DNA_DEFAULT_ID;
     $scope.spark = '';
-    $scope.sparkList = [{ 'sparkId': '123', 'sparkName': 'DNA_POC' }, { 'sparkId': '456', 'sparkName': 'common Room' }, { 'sparkId': '789', 'sparkName': 'Any_Name' }];
+    $scope.sparkList = [
+    		{
+    		'roomName' : "DNA-POC",
+    		"roomId" : "Y2lzY29zcGFyazovL3VzL1JPT00vNmY5ODRjNTAtYmIwNi0xMWU4LTlmNzgtY2ZkNmJiM2UzZWQ5"
+    		},
+    		{
+    		'roomName' : "DNA-C-Compliance",
+    		"roomId" : "Y2lzY29zcGFyazovL3VzL1JPT00vMTRiZWQ4NjAtYzg1Zi0xMWU4LWJjNmMtZWRlOWI4NmUzM2Fj"
+    		}
+    		];
 
     var generateId = function () {
         var text = "";
@@ -35,8 +44,8 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
     .then(function(response){
         $scope.dnahost = response.data.dna.host;
         $scope.dnaUsername = response.data.dna.username;
-        $scope.bhost = response.data.blockChain.host;
-        $scope.spark = response.data.spark.sparkId;
+        $scope.bhost = response.data.blockchain.host;
+        $scope.spark = response.data.spark.roomId;
         $scope.dnapassword = '';
     })
     .catch(function(response){
@@ -54,13 +63,13 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
                 username: $scope.dnaUsername,
                 password: $scope.dnapassword
             },
-            blockChain: {
+            blockchain: {
                 host: $scope.bhost,
                 //username: $scope.buserName,
                 //password: $scope.bpassword
             },
             spark: {
-                sparkId: $scope.spark
+            	roomId: $scope.spark
             }
         }
 
@@ -76,15 +85,15 @@ app.controller('ConfigController', function ($scope, $rootScope, $stateParams, $
                 console.log("success");
                 console.log(response);
                 alert("configuration saved successfully.");
-                $scope.reset();
+               // $scope.reset();
                 $state.transitionTo('config');
             },
-                function (response) { // optional
+                function (response) {
                     // failed
                     console.log(response);
                     console.log("failed to post");
                     alert("Error while saving configuration.");
-                    $scope.reset();
+                   // $scope.reset();
                     $state.transitionTo('config');
                 }
             );

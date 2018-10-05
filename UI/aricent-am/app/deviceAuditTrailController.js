@@ -3,10 +3,11 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
     $scope.username = $cookies.username;
     $scope.deviceList = [];
     //$scope.hostList =[];
-    $scope.deviceId = '';
+    $scope.serialNumber	 = '';
     $scope.hostId ='';
     $scope.auditSummary =[];
     $scope.isDisabled = true;
+    $scope.description = '';
     console.log("username---- "+ $scope.username);
       if(!$scope.username){
           $location.path('/login/');
@@ -33,7 +34,7 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
          var getDevices = function(){
              console.log("get devices called  Host Id"+$scope.hostId);
              $http({
-                 url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/devices',
+                 url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/asset',
                  method: "GET",
                  headers: {'Content-Type': 'application/json'}
              })
@@ -57,11 +58,10 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
       
          
       $scope.run = function(){
-          if($scope.hostId !='' && $scope.deviceId !='' && $scope.hostId != undefined && $scope.deviceId != undefined )
+          if($scope.hostId !='' && $scope.serialNumber !='' && $scope.hostId != undefined && $scope.serialNumber != undefined )
           {
           $http({
-               //url :'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/device/'+$scope.deviceId,
-                url : 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/audit?deviceId='+$scope.deviceId,
+                url : 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/audit?assetId='+$scope.serialNumber	,
                 method: "GET",
                 headers: {'Content-Type': 'application/json'}
             })
@@ -70,8 +70,13 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
                 console.log("success");
                 console.log(response);
                 //$scope.auditSummary.push(response.data);
-                for (var i=0;i<response.data.length;i++){
-                    $scope.auditSummary.push(response.data[i]);
+                for (var i=0;i<response.data.length;i++){	
+                	if(response.data[i].state){
+                		$scope.description = response.data[i].state;
+                	}else{
+                		$scope.description = 'Asset Discovered to DNA-C';
+                	}
+                   $scope.auditSummary.push({'description' : $scope.description, 'updatedOn': response.data[i].lastUpdated});
                 }
                 console.log("audit summary============================");
                 console.log($scope.auditSummary);

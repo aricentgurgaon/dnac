@@ -1,5 +1,5 @@
 var app = angular.module('myApp')
-app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies, cfg) {
+app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams, $state, $http,$location, $cookies, $filter, cfg) {
 	$scope.username = $cookies.username;
 	  if(!$scope.username){
 		  $location.path('/login/');
@@ -10,7 +10,22 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 	$scope.deviceType ='';
 	$scope.state ='';
 	$scope.info = '';
-	$scope.stateList = ['Purchase','Assign to engg.','Attach to DNA','Discovered'];
+	$scope.hostId ='';
+	$scope.stateList = ['Purchased','Assigned to engg.','Attached to DNA','Discovered'];
+	
+	 $http({
+         url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/config',
+         method: "GET",
+         headers: {'Content-Type': 'application/json'}
+     })
+     .then(function(response) {
+         $scope.hostId = response.data[0]._id;
+         }, 
+         function(error) {
+             // failed
+             console.log(error);
+             console.log("failed to get");
+         });
 	
 	$scope.search = function(){
 		if($scope.serialNo == '' || $scope.serialNo == undefined){
@@ -18,18 +33,15 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 			return;
 		}
 		 $http({
-			 url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/asset?assetId='+$scope.serialNo,
+			 url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/asset?assetId='+$scope.serialNo,
 			 method: "GET",
 			 headers: {'Content-Type': 'application/json'}
 		 })
 		 .then(function(response) {
-			 console.log(response);
-			 console.log(response.data);
-			 console.log(response.data.length);
 			 if(response.data != '' && response.data != undefined){
 			 	$scope.serialNo = response.data._id;
-				$scope.deviceName = response.data.deviceName;
-				$scope.deviceType = response.data.deviceType;
+				$scope.deviceName = response.data.hostname;
+				$scope.deviceType = response.data.type;
 				$scope.state = response.data.state;
 				$scope.info =  response.data.info;
 			 }
@@ -46,6 +58,9 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 	} 
 
 	$scope.save = function(){
+		
+		var date = Date.now();
+		var formatedDate = $filter('date')(date, 'yyyy-MM-dd HH:mm:ss');
 		if($scope.serialNo == '' || $scope.serialNo == undefined){
 			alert("Please Enter Asset Key.");
 			return;
@@ -63,13 +78,14 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 			return;
 		}
 		var assetData = {
-				deviceType : $scope.deviceType,
-				deviceName : $scope.deviceName,
+				type : $scope.deviceType,
+				hostname : $scope.deviceName,
 				state : $scope.state,
-				info : $scope.info
+				info : $scope.info,
+				lastUpdated : formatedDate
 		}
 		$http({
-	       url :'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/asset?assetId='+$scope.serialNo,
+	       url :'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/asset?assetId='+$scope.serialNo,
 	        method: "POST",
 	        data: assetData,
 	        headers: {'Content-Type': 'application/json'}
@@ -84,7 +100,6 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 	        }, 
 	        function(response) {
 	            // failed
-	        	console.log(response);
 				console.log("failed to post");
 				alert("Error While saving Asset.");
 				$scope.reset();

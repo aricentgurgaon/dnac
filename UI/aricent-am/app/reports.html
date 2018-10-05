@@ -12,7 +12,7 @@
                 <label>Select Template <span class="mandatory">*</span></label>
                 <div class="row">
                     <select class="form-control" id="template" ng-model="template">
-                        <option ng-repeat="x in templateList" value="{{x._id}}">{{x.templateName}}</option>
+                        <option ng-repeat="x in templateList" value="{{x._id}}">{{x.name}}</option>
                     </select>
                     <button class="btn btn-primary custom-form-btn-margin" data-toggle="tooltip" title="Run" ng-click="run()">Run</button>
                     <button class="btn btn-secondary custom-form-btn-margin" data-toggle="tooltip" title="Schedule" ng-click="Scheduler()">Scheduler</button>
