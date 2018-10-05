@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <head>
-	<title>About</title>
+	<title>Audit Trail</title>
 </head>
 
 <div class="container">
@@ -25,14 +25,14 @@
 		<table class="table table-condensed">
 			<thead>
 				<tr>
-					<th>Description</th>
 					<th>UpdatedOn</th>
+					<th>Description</th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr ng-repeat="x in auditSummary">
-					<td>{{x.description}}</td>
 					<td>{{x.updatedOn}}</td>
+					<td>{{x.description}}</td>
 				</tr>
 			</tbody>
 		</table>

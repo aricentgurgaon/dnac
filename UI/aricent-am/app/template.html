@@ -49,23 +49,12 @@
                         </div>
                     </div>
                 </div>
-                <div ng-switch-when="memorySize">
-                    <div class="form-group">
-                        <label>Memory Size <span class=" mandatory">*</span></label>
-                        <div>
-                            <select class="form-control" id="memsizecriteria" ng-model="$parent.memsizecriteria" ng-options="x for x in memorySizeList">
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div ng-switch-when="reachabilityStatus">
-                    <div class="form-group">
-                        <label>Reachability Status <span class=" mandatory">*</span></label>
-                        <div>
-                            <select class="form-control" id="reachstatuscriteria" ng-model="$parent.reachstatuscriteria" ng-options="x for x in reachabilityStatus">
-                            </select>
-                        </div>
-                    </div>
+            </div>
+            <div class="form-group">
+                <label>Description <span class=" mandatory">*</span></label>
+                <div>
+                    <input type="text" class="form-control" id="description" ng-model="description">
+                    </input>
                 </div>
             </div>
 

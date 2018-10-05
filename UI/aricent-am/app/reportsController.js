@@ -13,6 +13,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
     $scope.template = '';
     console.log("inside reports controller");
     $scope.nodesData = '';
+    $scope.deviceToBeChecked = '';
     
      $http({
         url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/template',
@@ -25,7 +26,6 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
             if(response.data[i].name)
                 $scope.templateList.push(response.data[i]);
         }
-        console.log($scope.templateList);
         }, 
         function(response) {
             // failed
@@ -41,7 +41,6 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
         })
         .then(function(response) {
             $scope.hostId = response.data[0]._id;
-            console.log($scope.hostId);
             }, 
             function(error) {
                 // failed
@@ -50,6 +49,11 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
             });
     
     $scope.run = function(){
+    	for(var i=0 ; i< $scope.templateList.length; i++){
+    		if($scope.templateList[i]._id == $scope.template){
+    			$scope.deviceToBeChecked = $scope.templateList[i].deviceType;
+    		}
+    	}
         if($scope.template =='' || $scope.template == undefined){
         	alert("Please select Template");
         	return;
@@ -136,7 +140,10 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
                 new go.Binding("stroke", "color", function (clr) {
                   if (clr ==='red') {
                 return "red";
-                  } 
+                  }
+                  else  if (clr ==='green') {
+                      return "green";
+                        } 
                 })
                )
                     //$(go.Picture, "../assets/images/Cloud_128x128.png"),
@@ -160,7 +167,7 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
         function diagramInfo(model) {
            if(model.label ==='cloud node')
            return model.deviceType+"\n\nThe Internet\n\n"+"IP Address:"+ model.ip + "\n\nNetwork Role:"+model.role;
-          return model.deviceType+"\n\n"+model.label +"\n\n"+"IP Address:"+ model.ip + "\n\nNetwork Role:"+model.role;
+          return model.deviceType+"\n\n"+model.label +"\n\n"+"IP Address:"+ model.ip + "\n\nNetwork Role:"+model.role+ "\n\nSoftware Version:"+model.softwareVersion;
         }
             // define a second kind of Node:
         $scope.myDiagram.nodeTemplateMap.add("WIRED",
@@ -218,8 +225,11 @@ app.controller('ReportsController', function($scope, $rootScope, $stateParams, $
                      /* else if(i==2||i==3){
                          node.color='red';
                         }*/
-                        if(node.compliant == false){
+                        if(node.compliant == false && node.deviceType == $scope.deviceToBeChecked){
                         	node.color='red';
+                        }
+                        else if(node.compliant == true && node.deviceType == $scope.deviceToBeChecked){
+                        	node.color='green';
                         }
                         
                         if(node.deviceType.toLowerCase().indexOf("switch")!=-1){

@@ -5,10 +5,9 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
     //$scope.hostList =[];
     $scope.serialNumber	 = '';
     $scope.hostId ='';
-    $scope.auditSummary =[];
+    $scope.auditSummary = '';
     $scope.isDisabled = true;
     $scope.description = '';
-    console.log("username---- "+ $scope.username);
       if(!$scope.username){
           $location.path('/login/');
       }
@@ -22,7 +21,6 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
             })
             .then(function(response) {
                 $scope.hostId = response.data[0]._id;
-                console.log($scope.hostId);
                 getDevices();
                 }, 
                 function(error) {
@@ -32,7 +30,6 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
                 });
          
          var getDevices = function(){
-             console.log("get devices called  Host Id"+$scope.hostId);
              $http({
                  url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/'+$scope.hostId+'/asset',
                  method: "GET",
@@ -68,8 +65,7 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
             .then(function(response) {
                     // success
                 console.log("success");
-                console.log(response);
-                //$scope.auditSummary.push(response.data);
+                $scope.auditSummary.push(response.data);
                 for (var i=0;i<response.data.length;i++){	
                 	if(response.data[i].state){
                 		$scope.description = response.data[i].state;
@@ -78,12 +74,9 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
                 	}
                    $scope.auditSummary.push({'description' : $scope.description, 'updatedOn': response.data[i].lastUpdated});
                 }
-                console.log("audit summary============================");
-                console.log($scope.auditSummary);
                 }, 
                 function(response) { // optional
                     // failed
-                    console.log(response);
                     console.log("failed to post");
                 });
           }
@@ -93,6 +86,4 @@ app.controller('DeviceAuditTrailController', function($scope, $rootScope, $state
           }
               
       }
-
-    console.log("inside device audit trail controller ");
 });

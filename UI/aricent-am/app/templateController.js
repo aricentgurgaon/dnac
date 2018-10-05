@@ -16,6 +16,7 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
     $scope.softypecriteria = '';
     $scope.sofvercriteria ='';
     $scope.criteriaValue = '';
+    $scope.description = '';
 
     var generateId = function () {
         var text = "";
@@ -45,11 +46,9 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
 		}
 		
 		if($scope.criteria == "softwareType") {
-			console.log("inside softwareType  "+$scope.softypecriteria);
 			$scope.criteriaValue = $scope.softypecriteria;
 		}
 		else if($scope.criteria == "softwareVersion"){ 
-			console.log("inside softwareversion  "+$scope.sofvercriteria);
 			$scope.criteriaValue = $scope.sofvercriteria;
 		}
 		else{
@@ -61,13 +60,12 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
 			return;
 		}
 		
-		console.log("criteria value "+$scope.criteriaValue);
-
 		var tempData = {
 				name : $scope.templateName,
 				deviceType : $scope.deviceType,
 				criteria : $scope.criteria,
-				criteriaValue : $scope.criteriaValue
+				criteriaValue : $scope.criteriaValue,
+				description : $scope.description
 		}
 		
 		$http({
@@ -79,7 +77,6 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
 	    .then(function(response) {
 	            // success
 	    	console.log("success");
-			console.log(response);
 			alert("Template Saved successfully.");
 			$scope.reset();
 			$state.transitionTo('template');
@@ -101,6 +98,6 @@ app.controller('TemplateController', function($scope, $rootScope, $stateParams, 
         $scope.softypecriteria = '';
         $scope.sofvercriteria ='';
         $scope.criteriaValue = '';
+        $scope.description = '';
     }
-    console.log("inside template controller");
 });

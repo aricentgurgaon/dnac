@@ -11,7 +11,7 @@ app.controller('AssetMgmtController', function($scope, $rootScope, $stateParams,
 	$scope.state ='';
 	$scope.info = '';
 	$scope.hostId ='';
-	$scope.stateList = ['Purchased','Assigned to engg.','Attached to DNA','Discovered'];
+	$scope.stateList = ['Purchased','Assigned To Engineer Team','Attached To DNA','Decommissioned','Moved To Store','Disposed'];
 	
 	 $http({
          url: 'https://' + cfg.API_SERVER_HOST + ':' + cfg.API_SERVER_PORT + '/eam/v1/dna/config',
